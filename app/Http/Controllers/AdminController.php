@@ -13,7 +13,21 @@ class AdminController extends Controller
      */
     public function index()
     {
+
+        $admin = Admin::all();
+        return $admin;
+
         //
+        // $this->authorize('viewAny', Admin::class);
+
+        // $admin = Admin::whereNotNull('id')->with('media', 'roles');
+        
+        // if ($request->has('name')){
+        //     FilteringService::filterByAllNames($request, $admin);
+        // }
+        // $adminData = $admin->paginate(FilteringService::getPaginate($request));
+
+        // return AdminResource::collection($adminData);
     }
 
     /**
