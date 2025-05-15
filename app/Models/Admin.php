@@ -3,18 +3,22 @@
 namespace App\Models;
 
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\MediaLibrary\HasMedia;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\Api\V1\NonQueuedMediaConversions;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\Concerns\HasRelationships;
 
-class Admin extends Authenticatable /*implements HasMedia*/
+class Admin extends Authenticatable implements HasMedia
 {
+
+    use HasApiTokens, Notifiable, SoftDeletes, InteractsWithMedia, HasRelationships, NonQueuedMediaConversions;
     /** @use HasFactory<\Database\Factories\AdminFactory> */
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, /* InteractsWithMedia,*/ HasRelationships /* NonQueuedMediaConversions */;
+    use HasFactory;
 
 
     protected $table = 'admins';
