@@ -2,20 +2,26 @@
 
 namespace App\Models;
 
+use Illuminate\Validation\Rule;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\MediaLibrary\HasMedia;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Validator;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Validators\Api\V1\PhoneNumberValidator;
 use App\Traits\Api\V1\NonQueuedMediaConversions;
+use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use App\Notifications\Api\V1\ResetPasswordNotification;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Admin extends Authenticatable implements HasMedia
 {
-
     use HasApiTokens, Notifiable, SoftDeletes, InteractsWithMedia, HasRelationships, NonQueuedMediaConversions;
     /** @use HasFactory<\Database\Factories\AdminFactory> */
     use HasFactory;
@@ -94,7 +100,6 @@ class Admin extends Authenticatable implements HasMedia
     // mutator function 
     // mutator functions are called automatically by laravel,
     // Define a mutator for the phone_number attribute
-    /*
     public function setPhoneNumberAttribute($value)
     {
         $phoneNumberValidator = new PhoneNumberValidator();
@@ -120,7 +125,6 @@ class Admin extends Authenticatable implements HasMedia
         // Finally, the formatted or validated phone number is set back to the model's phone_number attribute
         $this->attributes['phone_number'] = $formattedPhoneNumber;
     }
-    */
 
 
 
@@ -149,17 +153,17 @@ class Admin extends Authenticatable implements HasMedia
         return $this->hasManyDeepFromRelations($this->roles(), (new Role())->permissions());
     }
 
-
+    */
     
     
 
 
-    public function registerMediaConversions(Media $media = null): void
+    public function registerMediaConversions(?Media $media = null): void
     {
         $this->customizeMediaConversions();
     }
 
-    */
+    
     
 
 
