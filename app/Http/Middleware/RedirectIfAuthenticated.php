@@ -2,11 +2,12 @@
 
 // THIS WAS CREATED BY ME / ABRHAM - [ - NOT used - ] - 
 //      //
-//      // but NOT used b/c Laravel 12+ does NOT use it
+//      // but NOT used b/c Laravel 12+ does NOT use it,
 //
 // COMMENTED and NOT used , because LARAVEL 12+ does NOT need it
-// 
-// 
+//          // 
+//          -   - > i.e. the provider ('app\Providers\RouteServiceProvider.php') does NOT even exist for the NEW Laravel 12+
+//
 
 // namespace App\Http\Middleware;
 
