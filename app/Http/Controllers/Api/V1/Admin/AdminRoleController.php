@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\V1\Admin;
 
-use App\Models\Role;
-use App\Http\Requests\StoreRoleRequest;
-use App\Http\Requests\UpdateRoleRequest;
+use App\Models\AdminRole;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\AdminRequests\StoreAdminRoleRequest;
+use App\Http\Requests\Api\V1\AdminRequests\UpdateAdminRoleRequest;
 
-class RoleController extends Controller
+class AdminRoleController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,7 +20,7 @@ class RoleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreRoleRequest $request)
+    public function store(StoreAdminRoleRequest $request)
     {
         //
         // $var = DB::transaction(function () {
@@ -32,7 +33,7 @@ class RoleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Role $role)
+    public function show(AdminRole $adminRole)
     {
         //
     }
@@ -40,7 +41,7 @@ class RoleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRoleRequest $request, Role $role)
+    public function update(UpdateAdminRoleRequest $request, AdminRole $adminRole)
     {
         //
         // $var = DB::transaction(function () {
@@ -53,7 +54,7 @@ class RoleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Role $role)
+    public function destroy(AdminRole $adminRole)
     {
         //
     }

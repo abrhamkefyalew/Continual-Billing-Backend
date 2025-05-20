@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Api\V1\AdminRequests;
 
+use App\Models\Permission;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StorePermissionRequest extends FormRequest
@@ -11,7 +12,7 @@ class StorePermissionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('create', Permission::class);
     }
 
     /**
