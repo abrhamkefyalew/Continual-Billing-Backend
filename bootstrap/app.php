@@ -13,6 +13,12 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         //
 
+
+        // REGISTER MIDDLEWAREs From = '\app\Http\Middleware\'  IN the FOLLOWING TWO  = = = = = = 'append([])  - & -  alias([])
+        //                                                                          //
+        //                                                                          1. $middleware->append([])
+        //                                                                          2. $middleware->alias([])
+
         // Global middleware that Laravel 12+ does NOT include by default
         $middleware->append([
             \App\Http\Middleware\TrustProxies::class,   //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //   created this Middleware MANUALLY in 'app\Http\Middleware' (MUST be created Manually)
@@ -45,11 +51,28 @@ return Application::configure(basePath: dirname(__DIR__))
             // Sanctum-specific middleware
             'abilities' => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
             'ability' => \Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
+            
         ]);
 
         // Optional group definitions (only needed if customizing)
-        // $middleware->group('web', [...]);
-        // $middleware->group('api', [...]);
+        // $middleware->group('web', [
+        //     \App\Http\Middleware\EncryptCookies::class,
+        //     \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+        //     \Illuminate\Session\Middleware\StartSession::class,
+        //     \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        //     \App\Http\Middleware\VerifyCsrfToken::class,
+        //     \Illuminate\Routing\Middleware\SubstituteBindings::class,
+
+        // ]);
+        // $middleware->group('api', [
+        //     // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+        //     \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
+        //     \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        // ]);
+
+
+
+
 
 
     })

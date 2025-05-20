@@ -1,9 +1,8 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\AdminAuthController;
-use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\Admin\RoleController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -29,7 +28,9 @@ Route::get('/about', function () {
 
 
 
-
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
 
 
 
