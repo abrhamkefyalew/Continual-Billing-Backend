@@ -7,6 +7,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',  //      // THIS Line of Code WAS ADDED BY Me / ABRHAM, BECAUSE I Created the api.php manually, i needed to register it here  i.e. This two are added AUTOMATICALLY here by Laravel = > 1. Route::middleware('api')    - & -   2. ->prefix('api')    -> (instead of using the OLD RouteServiceProvider Laravel handles both of them Internally / Automatically)
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
@@ -55,20 +56,24 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         // Optional group definitions (only needed if customizing)
-        // $middleware->group('web', [
-        //     \App\Http\Middleware\EncryptCookies::class,
-        //     \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-        //     \Illuminate\Session\Middleware\StartSession::class,
-        //     \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-        //     \App\Http\Middleware\VerifyCsrfToken::class,
-        //     \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        $middleware->group('web', [
+            \App\Http\Middleware\EncryptCookies::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \Illuminate\Session\Middleware\StartSession::class,
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            \App\Http\Middleware\VerifyCsrfToken::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
 
-        // ]);
-        // $middleware->group('api', [
-        //     // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-        //     \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
-        //     \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        // ]);
+        ]);
+
+        
+        // REQUIRED - to Enable Throttling with RateLimiting
+        $middleware->group('api', [
+            // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',      //  //  //  //  //  // needs the PROVIDER = 'App\Providers\RateLimiterServiceProvider::class' that should be BOTH Created - & - Registered Otherwise it causes ERROR
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ]);
+        
 
 
 

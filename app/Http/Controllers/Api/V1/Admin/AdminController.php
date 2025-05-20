@@ -23,9 +23,14 @@ class AdminController extends Controller
         //     $user = Auth::user();
 
 
-        //     $user = auth()->user();
+        // $user = auth()->user();
+        // $user = auth()->guard('admin')->user();
+        $user = auth()->guard()->user();
 
-            
+        dd($user->id);
+
+
+
 
         //     $user = auth()->guard()->user();
 
@@ -85,7 +90,7 @@ class AdminController extends Controller
 
 
         //
-        $this->authorize('viewAny', Admin::class);
+        // $this->authorize('viewAny', Admin::class);
 
         $admin = Admin::whereNotNull('id')->with('media', 'roles');
         
