@@ -22,9 +22,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Admin extends Authenticatable implements HasMedia
 {
-    use HasApiTokens, Notifiable, SoftDeletes, InteractsWithMedia, HasRelationships, NonQueuedMediaConversions;
-    /** @use HasFactory<\Database\Factories\AdminFactory> */
-    use HasFactory;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, InteractsWithMedia, HasRelationships, NonQueuedMediaConversions;
 
 
     protected $table = 'admins';
@@ -135,7 +133,7 @@ class Admin extends Authenticatable implements HasMedia
 
 
 
-    /*
+
 
     public function address()
     {
@@ -153,7 +151,7 @@ class Admin extends Authenticatable implements HasMedia
         return $this->hasManyDeepFromRelations($this->roles(), (new Role())->permissions());
     }
 
-    */
+
     
     
 

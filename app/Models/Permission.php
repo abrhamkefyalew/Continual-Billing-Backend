@@ -49,23 +49,6 @@ class Permission extends Model
 
 
 
-
-
-
-    public const INDEX_BANK = 'INDEX_BANK';
-
-    public const SHOW_BANK = 'SHOW_BANK';
-
-    public const CREATE_BANK = 'CREATE_BANK';
-
-    public const EDIT_BANK = 'EDIT_BANK';
-
-    public const DELETE_BANK = 'DELETE_BANK';
-
-    public const RESTORE_BANK = 'RESTORE_BANK';
-
-
-
     
 
 

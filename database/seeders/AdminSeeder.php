@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Role;
 use App\Models\Admin;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -17,14 +18,14 @@ class AdminSeeder extends Seeder
         $admin = Admin::firstOrCreate([
             'email' => 'billing@admin.com',
         ], [
-            'first_name' => 'BillingF',
-            'last_name' => 'BillingL',
+            'first_name' => 'billingF',
+            'last_name' => 'billingL',
             'phone_number' => '123456789',
             'password' => bcrypt('password'),
         ]);
 
-        // $roleId = Role::where('title', Role::SUPER_ADMIN_ROLE)->first('id')->id;
+        $roleId = Role::where('title', Role::SUPER_ADMIN_ROLE)->first('id')->id;
 
-        // $admin->roles()->sync($roleId);
+        $admin->roles()->sync($roleId);
     }
 }
