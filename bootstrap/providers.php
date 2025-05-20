@@ -1,6 +1,11 @@
 <?php
 
 return [
+
+    // REGISTER PROVIDERs Here
+
+    
+
     App\Providers\AppServiceProvider::class,
     App\Providers\AuthServiceProvider::class,
         //
@@ -20,6 +25,7 @@ return [
 
     App\Providers\BroadcastServiceProvider::class,
     App\Providers\EventServiceProvider::class,
+    App\Providers\RateLimiterServiceProvider::class,
 
     
     // App\Providers\RouteServiceProvider::class,
