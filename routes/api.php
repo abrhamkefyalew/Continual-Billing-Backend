@@ -27,19 +27,19 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 //
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->name('api.v1.')->group(function () {
 
     // open routes
 
 
     
     // admin routes
-    Route::prefix('admin')->group(function () {
-        Route::prefix('')->group(function () {
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::prefix('auths')->name('auths.')->group(function () {
             // there should NOT be admin registration, -  
             // admin should be seeded or stored by an already existing admin -
             // there is a route for admin storing
-            Route::post('/login', [AdminAuthController::class, 'login']);
+            Route::post('/login', [AdminAuthController::class, 'login'])->name('login');
 
         });
 
@@ -50,48 +50,48 @@ Route::prefix('v1')->group(function () {
 
         Route::middleware(['auth:sanctum', 'abilities:access-admin'])->group(function () {
 
-            Route::prefix('')->group(function () {
-                Route::post('/logout', [AdminAuthController::class, 'logout']);
-                Route::post('/logout-all-devices', [AdminAuthController::class, 'logoutAllDevices']);
+            Route::prefix('tokens')->name('tokens.')->group(function () {
+                Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
+                Route::post('/logout-all-devices', [AdminAuthController::class, 'logoutAllDevices'])->name('logoutAllDevices');
             });
 
 
-            Route::prefix('admins')->group(function () {
-                Route::post('/', [AdminController::class, 'store']);
-                Route::get('/', [AdminController::class, 'index']);
+            Route::prefix('admins')->name('admins.')->group(function () {
+                Route::get('/', [AdminController::class, 'index'])->name('index');
+                Route::post('/', [AdminController::class, 'store'])->name('store');
                 Route::prefix('/{admin}')->group(function () {
-                    Route::get('/', [AdminController::class, 'show']);
-                    Route::put('/', [AdminController::class, 'update']);
-                    Route::delete('/', [AdminController::class, 'destroy']);
+                    Route::get('/', [AdminController::class, 'show'])->name('show');
+                    Route::put('/', [AdminController::class, 'update'])->name('update');
+                    Route::delete('/', [AdminController::class, 'destroy'])->name('destroy');
                 }); 
             });
 
             
 
-            Route::prefix('roles')->group(function () {
-                Route::get('/', [RoleController::class, 'index']);
-                Route::post('/', [RoleController::class, 'store']);
+            Route::prefix('roles')->name('roles.')->group(function () {
+                Route::get('/', [RoleController::class, 'index'])->name('index');
+                Route::post('/', [RoleController::class, 'store'])->name('store');
                 Route::prefix('/{role}')->group(function () {
-                    Route::get('/', [RoleController::class, 'show']);
-                    Route::put('/', [RoleController::class, 'update']);
-                    Route::delete('/', [RoleController::class, 'destroy']);
+                    Route::get('/', [RoleController::class, 'show'])->name('show');
+                    Route::put('/', [RoleController::class, 'update'])->name('update');
+                    Route::delete('/', [RoleController::class, 'destroy'])->name('destroy');
                 });
                 Route::prefix('/{id}')->group(function () {
-                    Route::post('/restore', [RoleController::class, 'restore']);
+                    Route::post('/restore', [RoleController::class, 'restore'])->name('restore');
                 });
             });
 
 
-            Route::prefix('permissions')->group(function () {
-                Route::get('/', [PermissionController::class, 'index']);
-                Route::post('/', [PermissionController::class, 'store']);
+            Route::prefix('permissions')->name('permissions.')->group(function () {
+                Route::get('/', [PermissionController::class, 'index'])->name('index');
+                Route::post('/', [PermissionController::class, 'store'])->name('store');
                 Route::prefix('/{permission}')->group(function () {
-                    Route::get('/', [PermissionController::class, 'show']);
-                    Route::put('/', [PermissionController::class, 'update']);
-                    Route::delete('/', [PermissionController::class, 'destroy']);
+                    Route::get('/', [PermissionController::class, 'show'])->name('show');
+                    Route::put('/', [PermissionController::class, 'update'])->name('update');
+                    Route::delete('/', [PermissionController::class, 'destroy'])->name('destroy');
                 });
                 Route::prefix('/{id}')->group(function () {
-                    Route::post('/restore', [PermissionController::class, 'restore']);
+                    Route::post('/restore', [PermissionController::class, 'restore'])->name('restore');
                 });
             });
 
