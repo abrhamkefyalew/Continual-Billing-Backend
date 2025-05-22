@@ -27,7 +27,7 @@ class AdminController extends Controller
         // $user = auth()->guard('admin')->user();
         $user = auth()->guard()->user();
 
-        dd($user->id);
+        // dd($user->id);
 
 
 
