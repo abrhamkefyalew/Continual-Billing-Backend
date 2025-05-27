@@ -12,8 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('asset_mains', function (Blueprint $table) {
-            $table->id();
+            $table->id()->from(100000);
+
+            $table->foreignId('enterprise_id')->constrained('enterprises');
+            $table->string('asset_name');
+            $table->string('asset_description')->nullable();
+            $table->boolean('is_active')->default(1);
+            
+            $table->string('type');  // the values are  = AssetMain::ASSET_MAIN_OF_ASSET_UNIT_TYPE  or   AssetMain::ASSET_MAIN_OF_ASSET_POOL_TYPE
+
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

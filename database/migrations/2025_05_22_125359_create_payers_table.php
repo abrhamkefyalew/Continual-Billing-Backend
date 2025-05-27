@@ -12,8 +12,21 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('payers', function (Blueprint $table) {
-            $table->id();
+            $table->id()->from(10000);
+
+            $table->string('first_name')->nullable();
+            $table->string('last_name')->nullable();
+            $table->string('email')->unique();
+            $table->string('phone_number')->unique();
+
+            $table->boolean('is_active')->default(1); // if the payer/customer is active in the sys // the PAYER/CUSTOMER can TOGGLE this depending on his availability 
+            $table->boolean('is_approved')->default(0); // should the payer/customer be approved before he can operate in the system     // should this column exist
+
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password'); // check first // check login type
+
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
