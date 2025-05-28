@@ -16,7 +16,7 @@ return new class extends Migration
 
             $table->integer('penalty_starts_after_days');    // this should ONLY be number of days // any integer/number stored in this column is considered as number of days
 
-            $table->decimal('percent_of_principal', 4, 2);   // this column holds the percent value of the  = principal_price, from : - asset_units or asset_pools table, FOR the specific asset the payer is paying for
+            $table->decimal('percent_of_principal_flat', 4, 2);   // this column holds the percent value of the  = principal_price, from : - asset_units or asset_pools table, FOR the specific asset the payer is paying for
                                                              //
                                                              // so, IF based on this column    - IF the penalty start date passes without the customer paying his/her principal_price payment
                                                              //                     //
@@ -25,7 +25,7 @@ return new class extends Migration
                                                              //
 
 
-            $table->decimal('percent_of_principal_daily', 4, 2);    // this column holds the percent value of the  = principal_price, from : - asset_units or asset_pools table, FOR the specific asset the payer is paying for
+            $table->decimal('percent_of_principal_daily_rate', 4, 2);    // this column holds the DAILY percent value of the  = principal_price, from : - asset_units or asset_pools table, FOR the specific asset the payer is paying for
                                                                     //                     //
                                                                     //                     // an additional penalty will be calculated for each UNPAID term NON STOP, for every day that passes, Until the payer clears his payment for that term
                                                                     //                     // the penalty of the payer will INCREASE as the days goes by

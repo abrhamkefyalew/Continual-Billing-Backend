@@ -24,8 +24,8 @@ class Directive extends Model
      */
     protected $fillable = [
         'type',
-        'name',
         'is_active',
+        'name',
     ];
 
 

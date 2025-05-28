@@ -17,7 +17,10 @@ return new class extends Migration
             $table->foreignId('enterprise_id')->constrained('enterprises');
             $table->string('asset_name');
             $table->string('asset_description')->nullable();
+
             $table->boolean('is_active')->default(1);
+
+            $table->boolean('is_occupied')->default(0);
             
             $table->string('type');  // the values are  = AssetMain::ASSET_MAIN_OF_ASSET_UNIT_TYPE  or   AssetMain::ASSET_MAIN_OF_ASSET_POOL_TYPE
 

@@ -28,6 +28,8 @@ class AssetMain extends Model implements HasMedia
         'asset_name',
         'asset_description',
         'is_active',
+        'is_occupied',
+        'type',
     ];
 
 

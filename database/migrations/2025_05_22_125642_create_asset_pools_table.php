@@ -21,9 +21,9 @@ return new class extends Migration
             $table->foreignId('directive_id')->constrained('directives');
             $table->foreignId('penalty_id')->constrained('penalties');
 
-            $table->decimal('price', 10, 2);
+            $table->decimal('price_principal', 10, 2);
 
-            $table->string('status')->default(AssetPool::ASSET_POOL_PAYMENT_NOT_STARTED);
+            $table->string('payment_status')->default(AssetPool::ASSET_POOL_PAYMENT_NOT_STARTED);
 
             $table->date('start_date');
             $table->date('end_date'); // if the this arrangement is terminated before the pre defined end_date - this should be assigned the date the order is terminated 
@@ -34,14 +34,14 @@ return new class extends Migration
                                                                                                 // 
                                                                                                 // the end_date will assume the date the arrangment is terminated     and      this original_end_date will assume the end_date inserted initially
 
-            $table->boolean('is_occupied')->default(1);
+            
 
             $table->boolean('is_terminated')->default(0);
             $table->boolean('payer_can_terminate')->default(0);
 
 
-            $table->string('asset_unit_name')->nullable();
-            $table->longText('asset_unit_description')->nullable();
+            $table->string('asset_pool_name')->nullable();
+            $table->longText('asset_pool_description')->nullable();
 
             $table->timestamps();
             $table->softDeletes();

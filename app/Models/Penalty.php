@@ -13,7 +13,7 @@ class Penalty extends Model
     use HasFactory;
 
 
-    protected $table = 'directives';
+    protected $table = 'penalties';
 
     /**
      * The attributes that are mass assignable.
@@ -21,8 +21,10 @@ class Penalty extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'type',
-        'name',
+        'penalty_starts_after_days',
+        'percent_of_principal_flat',
+        'percent_of_principal_daily_rate',
+        'service_termination_penalty',
         'is_active',
     ];
 
