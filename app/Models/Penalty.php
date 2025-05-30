@@ -21,10 +21,9 @@ class Penalty extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'penalty_starts_after_days',
+        'penalty_type',
         'percent_of_principal_flat',
         'percent_of_principal_daily_rate',
-        'service_termination_penalty',
         'is_active',
     ];
 
@@ -40,6 +39,14 @@ class Penalty extends Model
     {
         $this->hasMany(AssetPool::class);
     }
+
+
+
+    // constants
+    //
+    // penalty type constants
+    public const PENALTY_TYPE_FLAT = 'PENALTY_TYPE_FLAT';       // penalty is calculated once for each UNPAID Term               // penalty amount is calculated from the principal price using percent
+    public const PENALTY_TYPE_DAILY = 'PENALTY_TYPE_DAILY';     // penalty is calculated for each day inside the UNPAID Term     // penalty amount is calculated from the daily amount of the principal price using percent
 
     
 }

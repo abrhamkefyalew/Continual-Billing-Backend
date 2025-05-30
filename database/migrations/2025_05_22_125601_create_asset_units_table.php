@@ -21,6 +21,11 @@ return new class extends Migration
             $table->foreignId('directive_id')->constrained('directives');
             $table->foreignId('penalty_id')->constrained('penalties');
 
+
+            // the following TWO CAN have any kind of DIfferent - or - Similar values since, since ONE Asset is owned by a SINGLE person at a time  // there is NO obligation to make the following two similar
+            $table->integer('penalty_starts_after_days');    // this should ONLY be number of days // any integer/number stored in this column is considered as number of days
+            $table->decimal('service_termination_penalty', 10, 2); // this penalty will be calculated When/IF the payer want to terminate his service of his asset usage
+
             $table->decimal('price_principal', 10, 2);
 
             $table->string('payment_status')->default(AssetUnit::ASSET_UNIT_PAYMENT_NOT_STARTED);
@@ -39,6 +44,15 @@ return new class extends Migration
             $table->boolean('is_terminated')->default(0);
             $table->boolean('payer_can_terminate')->default(0);
 
+
+            $table->boolean('is_engaged')->default(0); // this is for, is the asset CURRENTLY Under-Way (asset Unit) - or - Under-Use (Asset Pool)?
+                                                                                                                    //
+                                                                                                                    // AssetUnit 
+                                                                                                                            // 0 = The Asset (i.e. house) is CURRENTLY NOT Occupied by SOMEONE else (i.e. vacant) - is used to make individual asset FREE, so that it can be used by Anyone else
+                                                                                                                                                                // - CURRENTLY Under Contract with someone else
+                                                                                                                            // 1 = The Asset (i.e. house) is CURRENTLY OCCUPIED by SOMEONE else (i.e. NOT vacant)               - is used to make individual asset NOT Free, so that it can NOT be used by Anyone else
+                                                                                                                                                                // - CURRENTLY NOT under Contract with anybody else    
+                                                                                                                    
 
             $table->string('asset_unit_name')->nullable();
             $table->longText('asset_unit_description')->nullable();

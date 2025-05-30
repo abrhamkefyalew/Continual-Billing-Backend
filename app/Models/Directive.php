@@ -59,38 +59,38 @@ class Directive extends Model
 
 
     /**
-     * central list of Allowed directive types as a mutable property
+     * central list of Allowed Directive Types as a mutable property
      * 
      */
-    public static $allowedTypes = [
-        self::DIRECTIVE_TYPE_DAY,
-        self::DIRECTIVE_TYPE_WEEK,
-        self::DIRECTIVE_TYPE_14,
-        self::DIRECTIVE_TYPE_15,
-        self::DIRECTIVE_TYPE_MONTH,
-        self::DIRECTIVE_TYPE_QUARTER,
-        self::DIRECTIVE_TYPE_SEMESTER,
-        self::DIRECTIVE_TYPE_YEAR,
-    ];
+    // public static $allowedTypes = [
+    //     self::DIRECTIVE_TYPE_DAY,
+    //     self::DIRECTIVE_TYPE_WEEK,
+    //     self::DIRECTIVE_TYPE_14,
+    //     self::DIRECTIVE_TYPE_15,
+    //     self::DIRECTIVE_TYPE_MONTH,
+    //     self::DIRECTIVE_TYPE_QUARTER,
+    //     self::DIRECTIVE_TYPE_SEMESTER,
+    //     self::DIRECTIVE_TYPE_YEAR,
+    // ];
 
 
     /**
-     * central list of Allowed directive types as a method
+     * central list of Allowed Directive types as a method
      * 
      */
-    // public static function allowedTypes(): array
-    // {
-    //     return [
-    //         self::DIRECTIVE_TYPE_DAY,
-    //         self::DIRECTIVE_TYPE_WEEK,
-    //         self::DIRECTIVE_TYPE_14,
-    //         self::DIRECTIVE_TYPE_15,
-    //         self::DIRECTIVE_TYPE_MONTH,
-    //         self::DIRECTIVE_TYPE_QUARTER,
-    //         self::DIRECTIVE_TYPE_SEMESTER,
-    //         self::DIRECTIVE_TYPE_YEAR,
-    //     ];
-    // }
+    public static function allowedTypes(): array
+    {
+        return [
+            self::DIRECTIVE_TYPE_DAY,
+            self::DIRECTIVE_TYPE_WEEK,
+            self::DIRECTIVE_TYPE_14,
+            self::DIRECTIVE_TYPE_15,
+            self::DIRECTIVE_TYPE_MONTH,
+            self::DIRECTIVE_TYPE_QUARTER,
+            self::DIRECTIVE_TYPE_SEMESTER,
+            self::DIRECTIVE_TYPE_YEAR,
+        ];
+    }
 
 
     /**
@@ -123,6 +123,7 @@ class Directive extends Model
 
     //     parent::save($options);
     // }
+    
 
 
 
@@ -159,11 +160,12 @@ class Directive extends Model
 
 
         // Commented because
-        // If self::$allowedTypes contains something like an int, null, boolean or unexpected type:
+        // If (self::allowedTypes() - or - self::$allowedTypes) - contains something like an int, null, boolean or unexpected type:
         //                          //  - It still gets converted to a string.  // - Laravel may accept it or fail silently.    // it's hard to debug
         // return [
         //     'type' => [
-        //         'required', 'in:' . implode(',', self::$allowedTypes)
+        //         // 'required', 'in:' . implode(',', self::$allowedTypes)
+        //         'required', 'in:' . implode(',', self::allowedTypes())
         //     ],
         // ];
     
@@ -171,8 +173,8 @@ class Directive extends Model
         //
         return [
             'type' => [
-                'required', 'string', Rule::in(self::$allowedTypes),
-                // 'required', 'string', Rule::in(self::allowedTypes()),
+                // 'required', 'string', Rule::in(self::$allowedTypes),
+                'required', 'string', Rule::in(self::allowedTypes()),
             ],
         ];
     }
@@ -184,23 +186,65 @@ class Directive extends Model
     public static function getMessages(): array
     {
         return [
-            'type.in' => 'INVALID DIRECTIVE TYPE. Allowed values are: ' . implode(', ', self::$allowedTypes) . '.',
+            'type.in' => 'INVALID DIRECTIVE TYPE. Allowed values are: ' . implode(', ', self::allowedTypes()) . '.',  // this is just returning ERROR message,  SO using = [ implode(', ', self::allowedTypes()) ] here is NOT a Problem.
         ];
     }
 
 
     /**
-     * Validate model data before saving
+     * Validate model data before doing WRITE Operation
+     * 
+     * Override save() to validate input before saving.
+     * 
+     *  = > NOT recommended BECAUSE
+     *                      //
+     *                      - ONLY works if save() is called directly form Controller or other code parts
+     *                      - will NOT work for other write functions -> i.e. create(), update(), updateOrCreate(), fill()
+     * 
      */
-    public function save(array $options = [])
+    // public function save(array $options = [])
+    // {
+    //     $validator = Validator::make($this->attributes, self::getRules(), self::getMessages());
+
+    //     if ($validator->fails()) {
+    //         throw new \Exception($validator->errors()->first());
+    //     }
+
+    //     parent::save($options);
+    // }
+
+
+
+    /**
+     * Validate model data before doing WRITE Operation
+     * 
+     * The "booting" method of the model.
+     *
+     * Registers a saving event that validates model attributes before persisting.
+     * This ensures that only a validated data is written to Database during  - > save() / fill()->save() / create() / update() / updateOrCreate() operations.
+     * 
+     * But still NOT work for insert() and upsert() - Because these are Query Builder-level operations, bypassing Eloquent models entirely 
+     * 
+     * 
+     *  = > RECOMMENDED BECAUSE
+     *                      //
+     *                      - Triggers Validation and Writing to DB during - > i.e. save(), create(), update(), updateOrCreate(), fill() operations.
+     *                      - But still NOT work for insert() and upsert() - Because these are Query Builder-level operations, bypassing Eloquent models entirely, - so no events (and no validation) are triggered.
+     * 
+     *
+     * @return void
+     */
+    protected static function boot()
     {
-        $validator = Validator::make($this->attributes, self::getRules(), self::getMessages());
+        parent::boot();
 
-        if ($validator->fails()) {
-            throw new \Exception($validator->errors()->first());
-        }
+        static::saving(function ($model) {
+            $validator = Validator::make($model->attributesToArray(), self::getRules(), self::getMessages());
 
-        parent::save($options);
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first());
+            }
+        });
     }
 
     
