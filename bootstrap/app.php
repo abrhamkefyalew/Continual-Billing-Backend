@@ -20,13 +20,32 @@ return Application::configure(basePath: dirname(__DIR__))
         //                                                                          1. $middleware->append([])
         //                                                                          2. $middleware->alias([])
 
-        // Global middleware that Laravel 12+ does NOT include by default
+        // Global Middleware 
+        //      that Laravel 12+ does NOT include by default
+        //
+        // Runs on every request.
         $middleware->append([
             \App\Http\Middleware\TrustProxies::class,   //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //   created this Middleware MANUALLY in 'app\Http\Middleware' (MUST be created Manually)
             \App\Http\Middleware\TrimStrings::class,    //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //   created this Middleware MANUALLY in 'app\Http\Middleware' (MUST be created Manually)
+
+            //
+            // ... other middleware
+            \App\Http\Middleware\DetectDevice::class, // run for all requests
+            
         ]);
 
-        // Middleware aliases that Laravel 12+ does NOT register by default
+        
+        /**
+         * The application's middleware aliases.
+         *
+         * Aliases may be used instead of class names to conveniently assign middleware to routes and groups.
+         * 
+         * 
+         * /////////////////// Middleware aliases that Laravel 12+ does NOT register by default //////////////////////////
+         * 
+         *
+         * @var array<string, class-string|string>
+         */
         $middleware->alias([
 
             // 'auth' => \App\Http\Middleware\Authenticate::class,      //  //  //  //  //  //  //  //  //  //  //  //   //   //  created this Middleware MANUALLY in 'app\Http\Middleware' (MUST be created Manually)  // but should NOT be created Because In Laravel 12+, the 'auth' middleware alias is automatically registered by default via the framework's internal service provider
