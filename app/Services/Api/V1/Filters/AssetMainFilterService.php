@@ -21,8 +21,6 @@ class AssetMainFilterService
                 $q->where('enterprise_id', $filters['enterprise_id_search']))
             ->when(isset($filters['is_active_search']) && filled($filters['is_active_search']), fn($q) =>
                 $q->where('is_active', $filters['is_active_search']))
-            ->when(isset($filters['is_occupied_search']) && filled($filters['is_occupied_search']), fn($q) =>
-                $q->where('is_occupied', $filters['is_occupied_search']))
             ->when(isset($filters['asset_name_search']) && filled($filters['asset_name_search']), fn($q) =>
                 $q->where('asset_name', 'like', '%' . $filters['asset_name_search'] . '%'))
             ->when(isset($filters['asset_description_search']) && filled($filters['asset_description_search']), fn($q) =>

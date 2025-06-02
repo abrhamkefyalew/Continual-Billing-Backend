@@ -5,19 +5,13 @@ namespace App\Services\Api\V1\Filters;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
-class AssetUnitFilterService
+class DirectiveFilterService
 {
-    public static function applyAssetUnitFilter(Builder $builder, Request $request): Builder
+    public static function applyDirectiveFilter(Builder $builder, Request $request): Builder
     {
         $filters = [
-            'enterprise_id_search' => 'enterprise_id',
-            'asset_main_id_search' => 'asset_main_id',
-            'payer_id_search' => 'payer_id',
-            'directive_id_search' => 'directive_id',
-            'penalty_id_search' => 'penalty_id',
-            'is_terminated_search' => 'is_terminated',
-            'payer_can_terminate_search' => 'payer_can_terminate',
-            'is_engaged_search' => 'is_engaged',
+            'type_search' => 'type',
+            'is_active_search' => 'is_active',
         ];
         //
         // Direct match filters
@@ -32,8 +26,7 @@ class AssetUnitFilterService
 
         // Partial match (LIKE) filters
         $likeFilters = [
-            'asset_unit_name_search' => 'asset_unit_name',
-            'asset_unit_description_search' => 'asset_unit_description',
+            'name_search' => 'name',
         ];
         //
         foreach ($likeFilters as $requestKey => $dbField) {

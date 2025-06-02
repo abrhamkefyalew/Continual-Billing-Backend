@@ -24,15 +24,15 @@ class AssetUnitController extends Controller
 
         // $assetMainsBuilder = AssetMain::whereNotNull('id');
 
-        $assetMainsBuilder = AssetUnit::query();
-        $assetMainsBuilder = AssetUnitFilterService::applyAssetUnitFilter($assetMainsBuilder, $request);
+        $assetUnitsBuilder = AssetUnit::query();
+        $assetUnitsBuilder = AssetUnitFilterService::applyAssetUnitFilter($assetUnitsBuilder, $request);
 
-        $assetMains = $assetMainsBuilder
+        $assetUnits = $assetUnitsBuilder
             ->with(['enterprise', 'address'])
             ->latest()
             ->paginate(FilteringService::getPaginate($request));
 
-        return AssetUnitResource::collection($assetMains);
+        return AssetUnitResource::collection($assetUnits);
     }
 
     /**
