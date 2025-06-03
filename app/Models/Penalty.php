@@ -22,8 +22,7 @@ class Penalty extends Model
      */
     protected $fillable = [
         'penalty_type',
-        'percent_of_principal_flat',
-        'percent_of_principal_daily_rate',
+        'percent_of_principal_price',
         'is_active',
     ];
 

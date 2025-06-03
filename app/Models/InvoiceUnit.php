@@ -30,6 +30,8 @@ class InvoiceUnit extends Model
         'status',
         'paid_date',
         'payment_method',
+        'reason',
+        'reason_description',
         'request_payload',
         'response_payload',
     ];

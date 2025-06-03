@@ -19,7 +19,8 @@ class InvoicePool extends Model
      */
     protected $fillable = [
         'invoice_code',
-        'asset_unit_id',
+        'asset_pool_id',
+        'payer_id',
         'transaction_id_system',
         'transaction_id_banks',
         'start_date',
@@ -30,6 +31,8 @@ class InvoicePool extends Model
         'status',
         'paid_date',
         'payment_method',
+        'reason',
+        'reason_description',
         'request_payload',
         'response_payload',
     ];
@@ -70,6 +73,10 @@ class InvoicePool extends Model
     }
 
 
+    public function payer()
+    {
+        return $this->belongsTo(Payer::class);
+    }
 
 
 

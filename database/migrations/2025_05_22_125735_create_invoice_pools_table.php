@@ -15,9 +15,12 @@ return new class extends Migration
         Schema::create('invoice_pools', function (Blueprint $table) {
             $table->id();
 
-            $table->string('invoice_code'); // Essential if the a multiple different invoices are paid once, which need to be considered at once // i.e. we use it during payment Callback & other places // so for them we use the same invoice code // it is not unique
+            $table->string('invoice_code')->nullable(); // Essential if the a multiple different invoices are paid once, which need to be considered at once // i.e. we use it during payment Callback & other places // so for them we use the same invoice code // it is not unique
+                                                        //          // is NOT set during bill generation (i.e. initially NULL during bill generation)
+                                                        //          // is SET when multiple invoices are paid together (i.e. when the payer selects multiple invoices to pay them together)
 
             $table->foreignId('asset_pool_id')->constrained('asset_pools');
+            $table->foreignId('payer_id')->constrained('payers');
 
             $table->uuid('transaction_id_system'); // this is our transaction id, which is created all the time // this should NOT be unique because when paying using invoice_code, all the invoices under that invoice code should have the same uuid (i.e. transaction_id_system)
             $table->string('transaction_id_banks')->nullable(); // this is the transaction id that comes from the banks during callback
@@ -35,6 +38,14 @@ return new class extends Migration
             $table->date('paid_date')->nullable(); // initially it is NULL when the bill is generated // set when payer pays this invoice or invoice group (with similar invoice_code)
 
             $table->string('payment_method')->nullable(); // should be NULL initially
+
+
+            // OPTIONAL Columns
+            //              // More likely for invoice_pools table
+            //
+            $table->string('reason')->nullable(); // we optionally write REASON of Payment - (i.e. is it joining fee - or - is it future pay) 
+            $table->longText('reason_description')->nullable(); // we optionally write REASON of Payment - (i.e. is it joining fee - or - is it future pay) // BUT we use this if the Reason of payment is LONGER
+
 
             //
             $table->json('request_payload')->nullable(); // if there is any request payload i need to store in the database // i will put it in this column

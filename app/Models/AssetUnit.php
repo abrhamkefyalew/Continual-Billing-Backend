@@ -126,7 +126,7 @@ class AssetUnit extends Model
     {
         //
         return [
-            'type' => [
+            'payment_status' => [
                 'required', 'string', Rule::in(self::allowedTypes()),
             ],
         ];
@@ -139,7 +139,7 @@ class AssetUnit extends Model
     public static function getMessages(): array
     {
         return [
-            'type.in' => 'INVALID Asset Unit Payment Status. Allowed values are: ' . implode(', ', self::allowedTypes()) . '.',  // this is just returning ERROR message,  SO using = [ implode(', ', self::allowedTypes()) ] here is NOT a Problem.
+            'payment_status.in' => 'INVALID Asset Unit Payment Status. Allowed values are: ' . implode(', ', self::allowedTypes()) . '.',  // this is just returning ERROR message,  SO using = [ implode(', ', self::allowedTypes()) ] here is NOT a Problem.
         ];
     }
 

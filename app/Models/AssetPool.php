@@ -23,10 +23,9 @@ class AssetPool extends Model
     protected $fillable = [
         'enterprise_id',
         'asset_main_id',
-        'payer_id',
+        // 'payer_id',  // for now this one will NOT be needed // abrham check
         'directive_id',
         'penalty_id',
-        'asset_pool_code',
         'penalty_starts_after_days',
         'service_termination_penalty',
         'price_principal',
@@ -125,7 +124,7 @@ class AssetPool extends Model
     {
         //
         return [
-            'type' => [
+            'payment_status' => [
                 'required', 'string', Rule::in(self::$allowedTypes),
             ],
         ];
@@ -138,7 +137,7 @@ class AssetPool extends Model
     public static function getMessages(): array
     {
         return [
-            'type.in' => 'INVALID Asset Pool Payment Status. Allowed values are: ' . implode(', ', self::$allowedTypes) . '.',
+            'payment_status.in' => 'INVALID Asset Pool Payment Status. Allowed values are: ' . implode(', ', self::$allowedTypes) . '.',
         ];
     }
 

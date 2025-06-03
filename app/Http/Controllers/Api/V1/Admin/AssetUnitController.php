@@ -20,15 +20,13 @@ class AssetUnitController extends Controller
      */
     public function index(Request $request)
     {
-        // $this->authorize('viewAny', AssetMain::class);
-
-        // $assetMainsBuilder = AssetMain::whereNotNull('id');
+        // $this->authorize('viewAny', AssetUnit::class);
 
         $assetUnitsBuilder = AssetUnit::query();
         $assetUnitsBuilder = AssetUnitFilterService::applyAssetUnitFilter($assetUnitsBuilder, $request);
 
         $assetUnits = $assetUnitsBuilder
-            ->with(['enterprise', 'address'])
+            ->with(['enterprise', 'assetMain', 'payer', 'directive', 'penalty'])
             ->latest()
             ->paginate(FilteringService::getPaginate($request));
 

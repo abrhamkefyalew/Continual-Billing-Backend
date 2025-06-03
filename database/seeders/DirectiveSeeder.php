@@ -15,16 +15,17 @@ class DirectiveSeeder extends Seeder
     {
         //
         foreach (Directive::allowedTypes() as $type) {
+
             Directive::updateOrCreate(
-                [
-                    'type' => $type
-                ], //   //  //  //  //  //  // Ensure uniqueness
+                
+                ['type' => $type], //   //  //  //  //  //  // Ensure uniqueness
 
                 [
                     'is_active' => true,
                     'name' => null,
                 ]
             );
+
         }
         
     }
