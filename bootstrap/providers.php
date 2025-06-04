@@ -25,6 +25,12 @@ return [
 
     App\Providers\BroadcastServiceProvider::class,
     App\Providers\EventServiceProvider::class,
+
+    App\Providers\ExceptionServiceProvider::class,
+            //
+            // Added Because, "app\Exceptions\Handler.php" is NOT=(also Could NOT) being Loaded\Registered\Binded to the $app Manually/Automaticallt anywhere in the project
+            // SO we are loading "app\Exceptions\Handler.php" using Service Provider (i.e. ExceptionServiceProvider)
+
     App\Providers\RateLimiterServiceProvider::class,
 
     
