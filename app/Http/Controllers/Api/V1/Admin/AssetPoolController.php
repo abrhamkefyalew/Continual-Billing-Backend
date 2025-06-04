@@ -8,17 +8,29 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Services\Api\V1\MediaService;
 use App\Services\Api\V1\FilteringService;
+use App\Services\Api\V1\Filters\AssetPoolFilterService;
 use App\Http\Requests\Api\V1\AdminRequests\StoreAssetPoolRequest;
 use App\Http\Requests\Api\V1\AdminRequests\UpdateAssetPoolRequest;
+use App\Http\Resources\Api\V1\AssetPoolResources\AssetPoolResource;
 
 class AssetPoolController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        // $this->authorize('viewAny', AssetPool::class);
+
+        $assetPoolsBuilder = AssetPool::query();
+        $assetPoolsBuilder = AssetPoolFilterService::applyAssetPoolFilter($assetPoolsBuilder, $request);
+
+        $assetPools = $assetPoolsBuilder
+            ->with(['enterprise', 'assetMain', 'payer', 'directive', 'penalty'])
+            ->latest()
+            ->paginate(FilteringService::getPaginate($request));
+
+        return AssetPoolResource::collection($assetPools);
     }
 
     /**

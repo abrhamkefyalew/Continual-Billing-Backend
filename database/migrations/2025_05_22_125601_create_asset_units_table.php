@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\AssetUnit;
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -21,9 +21,14 @@ return new class extends Migration
             $table->foreignId('directive_id')->constrained('directives');
             $table->foreignId('penalty_id')->constrained('penalties');
 
-            $table->decimal('price', 10, 2);
 
-            $table->string('status')->default(AssetUnit::ASSET_UNIT_PAYMENT_NOT_STARTED);
+            // the following TWO CAN have any kind of DIfferent - or - Similar values since, since ONE Asset is owned by a SINGLE person at a time  // there is NO obligation to make the following two similar
+            $table->integer('penalty_starts_after_days');    // this should ONLY be number of days // any integer/number stored in this column is considered as number of days
+            $table->decimal('service_termination_penalty', 10, 2); // this penalty will be calculated When/IF the payer want to terminate his service of his asset usage
+
+            $table->decimal('price_principal', 10, 2);
+
+            $table->string('payment_status')->default(AssetUnit::ASSET_UNIT_PAYMENT_NOT_STARTED);
 
             $table->date('start_date');
             $table->date('end_date'); // if the this arrangement is terminated before the pre defined end_date - this should be assigned the date the order is terminated 
@@ -34,11 +39,20 @@ return new class extends Migration
                                                                                                 // 
                                                                                                 // the end_date will assume the date the arrangment is terminated     and      this original_end_date will assume the end_date inserted initially
 
-            $table->boolean('is_occupied')->default(1);
+            
 
             $table->boolean('is_terminated')->default(0);
             $table->boolean('payer_can_terminate')->default(0);
 
+
+            $table->boolean('is_engaged')->default(0); // this is for, is the asset CURRENTLY Under-Way (asset Unit) - or - Under-Use (Asset Pool)?
+                                                                                                                    //
+                                                                                                                    // AssetUnit 
+                                                                                                                            // 0 = The Asset (i.e. house) is CURRENTLY NOT Occupied by SOMEONE else (i.e. vacant) - is used to make individual asset FREE, so that it can be used by Anyone else
+                                                                                                                                                                // - CURRENTLY Under Contract with someone else
+                                                                                                                            // 1 = The Asset (i.e. house) is CURRENTLY OCCUPIED by SOMEONE else (i.e. NOT vacant)               - is used to make individual asset NOT Free, so that it can NOT be used by Anyone else
+                                                                                                                                                                // - CURRENTLY NOT under Contract with anybody else    
+                                                                                                                    
 
             $table->string('asset_unit_name')->nullable();
             $table->longText('asset_unit_description')->nullable();

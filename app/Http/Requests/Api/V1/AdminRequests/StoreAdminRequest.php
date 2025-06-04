@@ -39,7 +39,7 @@ class StoreAdminRequest extends FormRequest
                 'required', 'min:8', 'confirmed',
             ],
             'phone_number' => [
-                'sometimes', 'numeric',  Rule::unique('admins'),
+                'sometimes', 'numeric', Rule::unique('admins'),     /* 'digits:13', 'starts_with:+251', */ // NOT Needed - since user can send any format of phone number and the backend auto-builds it to be real phone number format
             ],
             
 
