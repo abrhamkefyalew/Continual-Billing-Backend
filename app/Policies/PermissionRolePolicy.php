@@ -2,18 +2,25 @@
 
 namespace App\Policies;
 
+use App\Models\Admin as User;
+use App\Models\Permission;
 use App\Models\PermissionRole;
-use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
 class PermissionRolePolicy
 {
+
+    public function sync(User $user): bool
+    {
+        return $user->permissions()->where('permissions.title', Permission::SYNC_PERMISSION_ROLE)->exists();
+    }
+    
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->permissions()->where('permissions.title', Permission::INDEX_PERMISSION_ROLE)->exists();
     }
 
     /**
@@ -21,7 +28,7 @@ class PermissionRolePolicy
      */
     public function view(User $user, PermissionRole $permissionRole): bool
     {
-        return false;
+        return $user->permissions()->where('permissions.title', Permission::SHOW_PERMISSION_ROLE)->exists();
     }
 
     /**
@@ -29,7 +36,7 @@ class PermissionRolePolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->permissions()->where('permissions.title', Permission::EDIT_PERMISSION_ROLE)->exists();
     }
 
     /**
@@ -37,7 +44,7 @@ class PermissionRolePolicy
      */
     public function update(User $user, PermissionRole $permissionRole): bool
     {
-        return false;
+        return $user->permissions()->where('permissions.title', Permission::EDIT_PERMISSION_ROLE)->exists();
     }
 
     /**
@@ -45,7 +52,7 @@ class PermissionRolePolicy
      */
     public function delete(User $user, PermissionRole $permissionRole): bool
     {
-        return false;
+        return $user->permissions()->where('permissions.title', Permission::DELETE_PERMISSION_ROLE)->exists();
     }
 
     /**
@@ -53,7 +60,7 @@ class PermissionRolePolicy
      */
     public function restore(User $user, PermissionRole $permissionRole): bool
     {
-        return false;
+        return $user->permissions()->where('permissions.title', Permission::RESTORE_PERMISSION_ROLE)->exists();
     }
 
     /**
