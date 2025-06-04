@@ -50,7 +50,7 @@ class InvoiceUnit extends Model
         'paid_date' => 'date',
         'request_payload' => 'array', // USED
         'response_payload' => 'array', // USED
-        // 'response_payload' => 'json', // this works also
+        // 'response_payload' => 'json', // works also
     ];
 
 

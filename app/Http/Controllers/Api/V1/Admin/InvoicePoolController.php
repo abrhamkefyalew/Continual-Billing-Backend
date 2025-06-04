@@ -51,7 +51,9 @@ class InvoicePoolController extends Controller
      */
     public function show(InvoicePool $invoicePool)
     {
-        //
+        // $this->authorize('view', $invoicePool);
+        
+        return InvoicePoolResource::make($invoicePool->load(['assetPool', 'payer']));
     }
 
     /**

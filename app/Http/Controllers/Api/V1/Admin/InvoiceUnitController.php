@@ -51,7 +51,9 @@ class InvoiceUnitController extends Controller
      */
     public function show(InvoiceUnit $invoiceUnit)
     {
-        //
+        // $this->authorize('view', $invoiceUnit);
+        
+        return InvoiceUnitResource::make($invoiceUnit->load(['assetUnit']));
     }
 
     /**

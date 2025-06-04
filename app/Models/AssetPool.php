@@ -66,10 +66,11 @@ class AssetPool extends Model
         return $this->belongsTo(AssetMain::class);
     }
 
-    public function payer()
-    {
-        return $this->belongsTo(Payer::class);
-    }
+    // for now this one will NOT be needed // abrham check
+    // public function payer()
+    // {
+    //     return $this->belongsTo(Payer::class);
+    // }
 
     public function directive()
     {
