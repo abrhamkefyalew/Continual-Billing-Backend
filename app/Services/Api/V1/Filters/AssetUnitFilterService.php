@@ -40,6 +40,8 @@ class AssetUnitFilterService
 
         // Partial match (LIKE) filters
         $likeFilters = [
+            'start_date_search' => 'start_date',
+            'end_date_search' => 'end_date',
             'asset_unit_name_search' => 'asset_unit_name',
             'asset_unit_description_search' => 'asset_unit_description',
         ];
