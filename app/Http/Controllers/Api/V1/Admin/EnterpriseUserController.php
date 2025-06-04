@@ -51,7 +51,9 @@ class EnterpriseUserController extends Controller
      */
     public function show(EnterpriseUser $enterpriseUser)
     {
-        //
+        // $this->authorize('view', $enterpriseUser);
+
+        return EnterpriseUserResource::make($enterpriseUser->load(['media', 'address', /* 'enterpriseUsers'*/ ]));
     }
 
     /**

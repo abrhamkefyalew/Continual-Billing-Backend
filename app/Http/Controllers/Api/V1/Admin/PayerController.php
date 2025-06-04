@@ -51,7 +51,9 @@ class PayerController extends Controller
      */
     public function show(Payer $payer)
     {
-        //
+        // $this->authorize('view', $payer);
+
+        return PayerResource::make($payer->load(['media', 'address']));
     }
 
     /**

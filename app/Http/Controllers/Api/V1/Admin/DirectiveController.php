@@ -50,7 +50,9 @@ class DirectiveController extends Controller
      */
     public function show(Directive $directive)
     {
-        //
+        // $this->authorize('view', $directive);
+        
+        return DirectiveResource::make($directive);
     }
 
     /**

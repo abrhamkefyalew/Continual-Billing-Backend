@@ -51,7 +51,9 @@ class EnterpriseController extends Controller
      */
     public function show(Enterprise $enterprise)
     {
-        //
+        // $this->authorize('view', $enterprise);
+
+        return EnterpriseResource::make($enterprise->load(['media', 'address', 'enterprise']));
     }
 
     /**

@@ -50,7 +50,9 @@ class PenaltyController extends Controller
      */
     public function show(Penalty $penalty)
     {
-        //
+        // $this->authorize('view', $penalty);
+        
+        return PenaltyResource::make($penalty);
     }
 
     /**

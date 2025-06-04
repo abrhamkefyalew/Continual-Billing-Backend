@@ -14,11 +14,11 @@ class DirectiveSeeder extends Seeder
     public function run(): void
     {
         //
-        foreach (Directive::allowedTypes() as $type) {
+        foreach (Directive::allowedTypes() as $directiveType) {
 
             Directive::updateOrCreate(
                 
-                ['type' => $type], //   //  //  //  //  //  // Ensure uniqueness
+                ['directive_type' => $directiveType], //   //  //  //  //  //  // Ensure uniqueness
 
                 [
                     'is_active' => true,

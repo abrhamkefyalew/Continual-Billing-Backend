@@ -55,7 +55,9 @@ class AssetMainController extends Controller
      */
     public function show(AssetMain $assetMain)
     {
-        //
+        // $this->authorize('view', $assetMain);
+        
+        return AssetMainResource::make($assetMain->load(['media', 'address', 'enterprise']));
     }
 
     /**
