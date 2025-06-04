@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Models\Enterprise;
 use Illuminate\Http\Request;
+use App\Models\EnterpriseUser;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Services\Api\V1\MediaService;
@@ -39,11 +40,88 @@ class EnterpriseController extends Controller
     public function store(StoreEnterpriseRequest $request)
     {
         //
-        // $var = DB::transaction(function () {
+        $var = DB::transaction(function () use ($request) {
             
-        // });
+            // ENTERPRISE code Part
 
-        // return $var;
+            $enterprise = Enterprise::create([
+                'name' => $request['name'],
+                'enterprise_description' => $request['enterprise_description'],
+                'email' => $request['email'],
+                'phone_number' => $request['phone_number'],
+                'is_active' => (int) (isset($request['is_active']) ? $request['is_active'] : 1), // this works
+                'is_approved' => (int) $request->input('is_approved', 1), // this works also    // // this column can ONLY be Set by the SUPER_ADMIN, // if Enterprise is registering himself , he can NOT send the is_approved field
+                                                                                                   // so this //is_approved// code part will be removed when the Enterprise makes the request
+            ]);
+
+
+            if ($request->has('country') || $request->has('city')) {
+                $enterprise->address()->create([
+                    'country' => $request->input('country'),
+                    'city' => $request->input('city'),
+                ]);
+            }
+
+            // ENTERPRISE MEDIAs
+
+            // NO enterprise image remove, since it is the first time the enterprise is being stored
+            // also use the MediaService class to remove image
+
+            if ($request->has('enterprise_profile_image')) {
+                $file = $request->file('enterprise_profile_image');
+                $clearMedia = false; // or true // // NO enterprise image remove, since it is the first time the enterprise is being stored
+                $collectionName = Enterprise::ENTERPRISE_PROFILE_PICTURE;
+                MediaService::storeImage($enterprise, $file, $clearMedia, $collectionName);
+            }
+
+            
+
+
+
+
+
+            // ENTERPRISE USER code Part
+
+            $enterpriseUser = $enterprise->enterpriseUsers()->create([
+                'first_name' => $request['user_first_name'],
+                'last_name' => $request['user_last_name'],
+                'email' => $request['user_email'],
+                'password' => $request['user_password'],
+                'phone_number' => $request['user_phone_number'],
+                'is_active' => (int) (isset($request['user_is_active']) ? $request['user_is_active'] : 1), // this works
+                'is_admin' => 1,    // the enterprise user stored with the enterprise here (when the enterprise is created for the first time) must always be admin regardless of the user input
+            ]);
+
+
+            if ($request->has('user_country') || $request->has('user_city')) {
+                $enterpriseUser->address()->create([
+                    'country' => $request->input('user_country'),
+                    'city' => $request->input('user_city'),
+                ]);
+            }
+
+            
+            // ENTERPRISE USER MEDIAs
+
+            // NO enterprise_user image remove, since it is the first time the enterprise_user is being stored
+            // also use the MediaService class to remove image
+
+            if ($request->has('enterprise_user_profile_image')) {
+                $file = $request->file('enterprise_user_profile_image');
+                $clearMedia = false; // or true // // NO enterprise_user image remove, since it is the first time the enterprise_user is being stored
+                $collectionName = EnterpriseUser::ENTERPRISE_USER_PROFILE_PICTURE;
+                MediaService::storeImage($enterpriseUser, $file, $clearMedia, $collectionName);
+            }
+
+
+
+
+
+            return EnterpriseResource::make($enterprise->load('media', 'address', 'contracts' /*, 'orders'*/ , 'enterpriseUsers'));
+
+        });
+
+        return $var;
     }
 
     /**
