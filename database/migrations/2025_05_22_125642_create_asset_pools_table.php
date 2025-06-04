@@ -31,8 +31,8 @@ return new class extends Migration
 
             
             $table->date('start_date');
-            $table->date('end_date'); // if the this arrangement is terminated before the pre defined end_date - this should be assigned the date the order is terminated 
-                                      // (when the payer terminates his arrangement with the asset before the predefined end_date , the end_date column will be replaced by the value of the termination date)
+            $table->date('end_date'); // if the CONTENT on this ROW (i.e. event, campaign . . .) is terminated before the pre defined end_date - this should be assigned the date the order is terminated 
+                                      // (when the enterprise terminates the CONTENT on this ROW (i.e. event, campaign . . .) assetPool, before the predefined end_date , the end_date column will be replaced by the value of the termination date)
 
             $table->date('original_end_date'); // this is the end_date upon that the payer will use the asset as , its filled when the payer registers in to the asset and stats to use this asset initially, 
                                                                     // IF this arrestment is TERMINATED before the predefined end_date, 

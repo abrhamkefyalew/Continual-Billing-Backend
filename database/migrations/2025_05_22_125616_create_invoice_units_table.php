@@ -16,8 +16,9 @@ return new class extends Migration
             $table->id();
 
             $table->string('invoice_code')->nullable(); // Essential if the a multiple different invoices are paid once, which need to be considered at once // i.e. we use it during payment Callback & other places // so for them we use the same invoice code // it is not unique
-                                                        //          // is NOT set during bill generation (i.e. initially NULL during bill generation)
-                                                        //          // is SET when multiple invoices are paid together (i.e. when the payer selects multiple invoices to pay them together)
+                                                        //    // Initially NULL
+                                                        //          // it is NOT set during bill generation (i.e. initially NULL during bill generation)
+                                                        //          // it is SET when multiple invoices are paid together (i.e. when the payer selects multiple invoices to pay them together)
 
             $table->foreignId('asset_unit_id')->constrained('asset_units');
 
