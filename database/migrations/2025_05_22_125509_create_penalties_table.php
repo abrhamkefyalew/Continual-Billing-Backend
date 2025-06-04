@@ -43,6 +43,11 @@ return new class extends Migration
 
             $table->boolean('is_active')->default(1);
 
+
+            // ABRHAM check
+            // Penalty should be Global and any penalty type should be used by any enterprise in the system, so there is NO need to put a column here to show who created this penalty 
+            // BUT should this have a column to identify who created this penalty ?
+
             $table->timestamps();
             $table->softDeletes();
         });

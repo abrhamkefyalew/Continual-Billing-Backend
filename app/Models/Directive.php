@@ -23,7 +23,7 @@ class Directive extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'type',
+        'directive_type',
         'is_active',
         'name',
     ];
@@ -44,7 +44,7 @@ class Directive extends Model
 
 
 
-    // constants // constants for 'type' column in directives table
+    // constants // constants for 'directive_type' column in directives table
     public const DIRECTIVE_TYPE_DAY = 'DAY';
     public const DIRECTIVE_TYPE_WEEK = 'WEEK';
     public const DIRECTIVE_TYPE_14 = '14';
@@ -59,7 +59,7 @@ class Directive extends Model
 
 
     /**
-     * central list of Allowed Directive Types as a mutable property
+     * central list of Allowed Directive directive_type as a mutable property
      * 
      */
     // public static $allowedTypes = [
@@ -100,14 +100,14 @@ class Directive extends Model
     // NOT DRY
     //
     // public static $rules = [
-    //     'type' => 'required|in:DAY,WEEK,14,15,MONTH,QUARTER,SEMESTER,YEAR',
+    //     'directive_type' => 'required|in:DAY,WEEK,14,15,MONTH,QUARTER,SEMESTER,YEAR',
     // ];
 
     // /**
     //  * Custom validation messages.
     //  */
     // public static $messages = [
-    //     'type.in' => 'INVALID DIRECTIVE TYPE. Allowed values are: DAY, WEEK, 14, 15, MONTH, QUARTER, SEMESTER, YEAR.',
+    //     'directive_type.in' => 'INVALID DIRECTIVE TYPE. Allowed values are: DAY, WEEK, 14, 15, MONTH, QUARTER, SEMESTER, YEAR.',
     // ];
 
     // /**
@@ -142,7 +142,7 @@ class Directive extends Model
     {
 
         // return [
-        //     'type' => [
+        //     'directive_type' => [
         //         'required', 
         //         'string', 
         //         Rule::in([
@@ -163,7 +163,7 @@ class Directive extends Model
         // If (self::allowedTypes() - or - self::$allowedTypes) - contains something like an int, null, boolean or unexpected type:
         //                          //  - It still gets converted to a string.  // - Laravel may accept it or fail silently.    // it's hard to debug
         // return [
-        //     'type' => [
+        //     'directive_type' => [
         //         // 'required', 'in:' . implode(',', self::$allowedTypes)
         //         'required', 'in:' . implode(',', self::allowedTypes())
         //     ],
@@ -172,7 +172,7 @@ class Directive extends Model
 
         //
         return [
-            'type' => [
+            'directive_type' => [
                 // 'required', 'string', Rule::in(self::$allowedTypes),
                 'required', 'string', Rule::in(self::allowedTypes()),
             ],
@@ -186,7 +186,7 @@ class Directive extends Model
     public static function getMessages(): array
     {
         return [
-            'type.in' => 'INVALID DIRECTIVE TYPE. Allowed values are: ' . implode(', ', self::allowedTypes()) . '.',  // this is just returning ERROR message,  SO using = [ implode(', ', self::allowedTypes()) ] here is NOT a Problem.
+            'directive_type.in' => 'INVALID DIRECTIVE TYPE. Allowed values are: ' . implode(', ', self::allowedTypes()) . '.',  // this is just returning ERROR message,  SO using = [ implode(', ', self::allowedTypes()) ] here is NOT a Problem.
         ];
     }
 

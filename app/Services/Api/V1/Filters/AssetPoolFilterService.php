@@ -7,6 +7,15 @@ use Illuminate\Http\Request;
 
 class AssetPoolFilterService
 {
+
+
+    /**
+     * Applies filters to the AssetPool query based on request input.
+     *
+     * @param  Builder  $builder  The query builder instance for model.
+     * @param  Request  $request  The HTTP request containing filter parameters.
+     * @return Builder            The modified query builder with applied filters.
+     */
     public static function applyAssetPoolFilter(Builder $builder, Request $request): Builder
     {
         $filters = [

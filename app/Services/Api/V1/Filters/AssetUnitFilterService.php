@@ -7,6 +7,14 @@ use Illuminate\Http\Request;
 
 class AssetUnitFilterService
 {
+
+    /**
+     * Applies filters to the AssetUnit query based on request input.
+     *
+     * @param  Builder  $builder  The query builder instance for model.
+     * @param  Request  $request  The HTTP request containing filter parameters.
+     * @return Builder            The modified query builder with applied filters.
+     */
     public static function applyAssetUnitFilter(Builder $builder, Request $request): Builder
     {
         $filters = [

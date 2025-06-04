@@ -8,7 +8,7 @@ class PayerFilterService
 {
 
     /**
-     * Applies filters to the AssetMain query based on request input.
+     * Applies filters to the Payer query based on request input.
      *
      * @param  Builder  $builder
      * @param  array    $filters

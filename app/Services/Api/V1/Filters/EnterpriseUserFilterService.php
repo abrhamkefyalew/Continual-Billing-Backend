@@ -8,7 +8,7 @@ class EnterpriseUserFilterService
 {
 
     /**
-     * Applies filters to the AssetMain query based on request input.
+     * Applies filters to the EnterpriseUser query based on request input.
      *
      * @param  Builder  $builder
      * @param  array    $filters

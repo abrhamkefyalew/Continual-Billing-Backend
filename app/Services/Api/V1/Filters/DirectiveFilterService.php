@@ -7,6 +7,15 @@ use Illuminate\Http\Request;
 
 class DirectiveFilterService
 {
+
+
+    /**
+     * Applies filters to the Directive query based on request input.
+     *
+     * @param  Builder  $builder  The query builder instance for model.
+     * @param  Request  $request  The HTTP request containing filter parameters.
+     * @return Builder            The modified query builder with applied filters.
+     */
     public static function applyDirectiveFilter(Builder $builder, Request $request): Builder
     {
         $filters = [
@@ -37,17 +46,18 @@ class DirectiveFilterService
         
 
 
-        // Validate and apply 'type_search'
-        if (isset($request['type_search']) && filled($request['type_search'])) {
-            $typeSearch = $request->type_search;
+        // Validate and apply 'directive_type_search'
+        if (isset($request['directive_type_search']) && filled($request['directive_type_search'])) {
+            $directiveTypeSearch = $request->directive_type_search;
             
-            // if (!in_array($typeSearch, \App\Models\AssetUnit::allowedTypes(), true)) {
-            //     abort(400, 'Invalid value for type_search');
+            // OPTIONAL // since is it checked below also // may be redundant // use this if you want to return error for wrong values sent during filter
+            // if (!in_array($directiveTypeSearch, \App\Models\Directive::allowedTypes(), true)) {
+            //     abort(400, 'Invalid value for directive_type');
             // }
 
 
-            if (in_array($typeSearch, \App\Models\Directive::allowedTypes(), true)) {
-                $builder->where('type', $typeSearch);
+            if (in_array($directiveTypeSearch, \App\Models\Directive::allowedTypes(), true)) {
+                $builder->where('directive_type', $directiveTypeSearch);
             }
 
             
