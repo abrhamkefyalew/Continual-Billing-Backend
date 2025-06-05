@@ -49,8 +49,8 @@ class EnterpriseController extends Controller
                 'enterprise_description' => $request['enterprise_description'],
                 'email' => $request['email'],
                 'phone_number' => $request['phone_number'],
-                'is_active' => (int) (isset($request['is_active']) ? $request['is_active'] : 1), // this works
-                'is_approved' => (int) $request->input('is_approved', 1), // this works also    // // this column can ONLY be Set by the SUPER_ADMIN, // if Enterprise is registering himself , he can NOT send the is_approved field
+                'is_active' => (int) (isset($request['is_active']) ? $request['is_active'] : 1), 
+                'is_approved' => (int) $request->input('is_approved', 1),    // // this column can ONLY be Set by the SUPER_ADMIN, // if Enterprise is registering himself , he can NOT send the is_approved field
                                                                                                    // so this //is_approved// code part will be removed when the Enterprise makes the request
             ]);
 
@@ -88,7 +88,7 @@ class EnterpriseController extends Controller
                 'email' => $request['user_email'],
                 'password' => $request['user_password'],
                 'phone_number' => $request['user_phone_number'],
-                'is_active' => (int) (isset($request['user_is_active']) ? $request['user_is_active'] : 1), // this works
+                'is_active' => (int) (isset($request['user_is_active']) ? $request['user_is_active'] : 1), // 
                 'is_admin' => 1,    // the enterprise user stored with the enterprise here (when the enterprise is created for the first time) must always be admin regardless of the user input
             ]);
 
@@ -117,7 +117,7 @@ class EnterpriseController extends Controller
 
 
 
-            return EnterpriseResource::make($enterprise->load('media', 'address', 'contracts' /*, 'orders'*/ , 'enterpriseUsers'));
+            return EnterpriseResource::make($enterprise->load(['media', 'address', 'enterpriseUsers']));
 
         });
 
@@ -131,7 +131,7 @@ class EnterpriseController extends Controller
     {
         // $this->authorize('view', $enterprise);
 
-        return EnterpriseResource::make($enterprise->load(['media', 'address', 'enterprise']));
+        return EnterpriseResource::make($enterprise->load(['media', 'address', 'enterpriseUsers']));
     }
 
     /**
@@ -140,11 +140,48 @@ class EnterpriseController extends Controller
     public function update(UpdateEnterpriseRequest $request, Enterprise $enterprise)
     {
         //
-        // $var = DB::transaction(function () {
+        $var = DB::transaction(function () use ($request, $enterprise) {
             
-        // });
+            $success = $enterprise->update($request->validated());
+            //
+            if (!$success) {
+                return response()->json(['message' => 'Update Failed'], 500);
+            }
+            
 
-        // return $var;
+            if ($request->has('country') || $request->has('city')) {
+                if ($enterprise->address) {
+                    $enterprise->address()->update([
+                        'country' => $request->input('country'),
+                        'city' => $request->input('city'),
+                    ]);
+                } else {
+                    $enterprise->address()->create([
+                        'country' => $request->input('country'),
+                        'city' => $request->input('city'),
+                    ]);
+                }
+            }
+
+
+
+            // MEDIA CODE SECTION
+            //
+            if ($request->has('enterprise_profile_image')) {
+                $file = $request->file('enterprise_profile_image');
+                $clearMedia = $request->input('enterprise_profile_image_remove', false);
+                $collectionName = Enterprise::ENTERPRISE_PROFILE_PICTURE;
+                MediaService::storeImage($enterprise, $file, $clearMedia, $collectionName);
+            }
+
+            
+            $updatedEnterprise = Enterprise::find($enterprise->id);
+
+            return EnterpriseResource::make($updatedEnterprise->load(['media', 'address', 'enterpriseUsers']));
+
+        });
+
+        return $var;
     }
 
     /**

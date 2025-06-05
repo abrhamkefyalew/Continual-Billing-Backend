@@ -29,6 +29,7 @@ class InvoicePool extends Model
         'end_date',
         'price',
         'penalty',
+        'number_of_penalty_days',
         'immune_to_penalty',
         'status',
         'paid_date',

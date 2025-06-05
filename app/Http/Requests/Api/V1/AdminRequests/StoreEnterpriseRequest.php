@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\V1\AdminRequests;
 
+use App\Models\Enterprise;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -110,7 +111,7 @@ class StoreEnterpriseRequest extends FormRequest
                 'max:3072',
             ],
             // since it is Storing Enterprise User for the first time there is no need to remove any image // so we do NOT need remove_image
-            // and also when removing image, we should also provide the collection to remove only specific collection like, ENTERPRISE_USER_PROFILE_PICTURE or DRIVER_LICENSE_PICTURE, 
+            // and also when removing image, we should also provide the collection to remove only specific collection like, ENTERPRISE_USER_PROFILE_PICTURE, 
             // AND for remove send it just like the following     // the request key value + remove //
             // 'enterprise_user_profile_image_remove' => [
             //     'sometimes', 'boolean',

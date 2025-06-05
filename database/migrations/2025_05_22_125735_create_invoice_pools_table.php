@@ -32,6 +32,8 @@ return new class extends Migration
             // these TWO will be added during payment
             $table->decimal('price', 10, 2); // is (the date differences multiplied by the asset_unit principal_price)
             $table->decimal('penalty', 10, 2)->default(0); // is the calculated penalty price // during payment it will be added with the price column 
+            $table->integer('number_of_penalty_days');  // check this column always, 
+                                                        // = do NOT use it for Multiplication (i.e. to get penalty) if it is 0 , DOUBLE CHECK if you do Multiplication using this column
 
             $table->boolean('immune_to_penalty')->default(0);
 
