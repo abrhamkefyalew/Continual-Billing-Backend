@@ -3,10 +3,13 @@
 namespace App\Services\Api\V1\ModelServices\InvoiceUnit;
 
 use Carbon\Carbon;
+use App\Models\Penalty;
 use App\Models\AssetUnit;
 use App\Models\InvoiceUnit;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Builder;
 
 class InvoiceUnitService
@@ -31,7 +34,7 @@ class InvoiceUnitService
         $assetUnit = AssetUnit::where('payer_id', auth()->guard()->user()->id)->where('id', $request['enterprise_service_id']);
 
         $this->generateBill($startDate, $endDate, $assetUnit);
-        $this->updatePenalty($assetUnit); // penalty calculation end date must always be until TODAY,     - so ALWAYS this is set automatically as NOW(),    - NO other value can NOT be set from other customer input or db input  // i have set now end_date inside the updatePenalty() function itself
+        $this->updatePenaltyForMultipleAssetUnitsForAllPayers($assetUnit); // penalty calculation end date must always be until TODAY,     - so ALWAYS this is set automatically as NOW(),    - NO other value can NOT be set from other customer input or db input  // i have set now end_date inside the updatePenalty() function itself
         $this->getInvoices($assetUnit); // end_date should NOT be set - we fetch all invoices including the future invoices that are generated for pre payment
     }
 
@@ -77,7 +80,7 @@ class InvoiceUnitService
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-        $endDate = $endDate ?? Carbon::now();
+        $endDate = $endDate ?? Carbon::today();
         // $endDate = Carbon::parse(NOW()); // NOT USED since Resource consuming b/c of redundancy
         
 
@@ -138,7 +141,7 @@ class InvoiceUnitService
 
 
 
-            if ($endDate->lte($startDate)) {
+            if ($endDate->lt($startDate)) {
                 return "ERROR : - the end date in which your invoice will be generated upto -- should be greater than the start date from your invoice will be calculated after. (i.e. the bill generation date[end date] should always be greater than service start date)";
             }
 
@@ -335,7 +338,7 @@ class InvoiceUnitService
 
             
 
-            if ($endDate->lte($lastInvoiceEndDate)) {
+            if ($endDate->lt($lastInvoiceEndDate)) {
                 return "ERROR : - the end date in which your invoice will be generated upto should be greater than the start date from your invoice will be calculated after. (i.e. the bill generation date[end date] should always be greater than the last bill generation date)";
             }
 
@@ -440,6 +443,54 @@ class InvoiceUnitService
                     } 
                 }
     
+
+
+
+                //
+            //
+            // ******************************************************************************************************************************************************************************************************************************************
+
+            // i.e. and some assetUnits does NOT have END date, they are infinite // Ex. - EDIR,    - Rent without contract
+            // i.e. some assetUnits HAVE END DATE , so they are finite            // Ex. - EKUB, ,  - Rent with contract that have end date 
+            //
+            //
+            //
+            // if the end date of assetUnit is set  (Ex. - EKUB ,   - Rent with contract that have end date)        
+            if (isset($assetUnit->end_date)) {
+
+                $assetUnitEndDate = Carbon::parse($assetUnit->end_date);
+
+
+
+
+
+
+
+
+
+                // this is WRONG IF condition,  [ - NOT used - ] - [ DO NOT use ]
+                // Because the payer could pay his due , even after the service end_date passes, 
+                //             payer also could ask bill generation even after the service end_date passes
+                //             he could also be given penalty even after the service end_date passes, and the penalty will be generated long after the actual service end_date , IF he does NOT pay his due
+                //
+                //
+                //  WHAT WE SHOULD DO IS    (  i.e. for = = = if ($endDate->gt($assetUnitEndDate))  )
+                //
+                //          1. BIll generation      =      upto $assetUnit->end_date
+                //          2. Penalty Generation   = ONLY upto NOW() / upto today() - - - i.e. ( upto Carbon::now() )
+                //
+                // the end date the user inserts OR now() is greater than the date where the Actual enterprise ends,  then we should return error
+                if ($endDate->gt($assetUnitEndDate)) {
+                    return "the bill calculation date in which calculation will be done upto must always be less than the date the Actual service ends";
+                }
+
+
+
+            }
+            // ******************************************************************************************************************************************************************************************************************************************
+
+
+            
     
 
                 
@@ -558,14 +609,248 @@ class InvoiceUnitService
 
 
 
+
+
+
+    /**
+     * Penalty will only be generated/Updated for the already generated invoices/bills ONLY (those already generaged  Bills/invoices should also be UNPAID invoices)
+     * 
+     * so NO new invoice/bill will be generated here
+     * 
+     * Penalty will be Updated for
+     *      1. AssetUnits  -> with payment_status = (PAYMENT_STARTED & PAYMENT_LAST)
+     *      1. Invoices    -> with status         = (NOT_PAID)
+     * 
+     */
+    public function updatePenaltyForMultipleAssetUnitsForAllPayers(InvoiceUnit $invoiceUint)
+    {
+
+
+
+    }
+
+
+
+
+    /**
+     * Penalty will only be generated/Updated for the already generated invoices/bills ONLY (those already generaged  Bills/invoices should also be UNPAID invoices)
+     * 
+     * so NO new invoice/bill will be generated here, ONLY PENALTY is updated in this function
+     * 
+     * Penalty will be Updated for
+     *      1. AssetUnits  -> with payment_status = (PAYMENT_STARTED & PAYMENT_LAST)
+     *      1. Invoices    -> with status         = (NOT_PAID)
+     * 
+     */
+    public function updatePenaltyForMultipleAssetUnitsForSinglePayer()
+    {
+        
+        try {
+
+            DB::transaction(function () {
+
+                // i.e. the below code does UPDATE PENALTY Operation for INVOICEs under          
+                //                      ||                                            1. a MULTIPLE AssetUnits   -> that have status (PAYMENT_STARTED & PAYMENT_LAST)    
+                //                      ||                                                     BUT for    
+                //                      ||                                            2. a single payer
+                //                      ||
+                //                      \/
+
+                $endDate = Carbon::today();  // penalty calculation end date must always be until TODAY,     - so ALWAYS this is set automatically as NOW(),    - NO other value can NOT be set from other customer input or db input
+
+                
+                $allowedPaymentStatusTypes = [
+                    AssetUnit::ASSET_UNIT_PAYMENT_STARTED,
+                    AssetUnit::ASSET_UNIT_PAYMENT_LAST,
+                ];
+
+                $assetUnits = AssetUnit::where('payer_id', auth()?->guard()?->user())
+                        ->whereIn('payment_status', $allowedPaymentStatusTypes)
+                        ->get();
+
+                $assetUnitIds = $assetUnits->pluck('id');
+
+                $unpaidInvoiceUnits = InvoiceUnit::whereIn('asset_unit_id', $assetUnitIds)
+                        ->where('status', InvoiceUnit::INVOICE_STATUS_NOT_PAID)
+                        ->where('immune_to_penalty', 0)
+                        ->whereDate('end_date', '<=', today()->toDateString()) // is added, NOT to include bills that are generated for FUTURE pay In the Penalty Calculation = (i.e. NOT to include the invoices generated for i.e. for the next 4 months in the future), done NOT to include pre/advance/ahead/invoice generations in penalty calculation
+                        // ->whereDate('end_date', '<=', now()->toDateString())
+                        // ->whereDate('end_date', '<=', Carbon::today()->toDateString())
+                        // ->whereDate('end_date', '<=', Carbon::now()->toDateString())
+                        ->get();
+
+
+                //
+
+                foreach ($unpaidInvoiceUnits as $invoiceUnit) {
+
+
+                    $penaltyStartsAfterDays = $invoiceUnit->assetUnit->penalty_starts_after_days;
+
+
+
+                    $invoiceUnitEndDate = Carbon::parse($invoiceUnit->end_date);
+
+                    
+
+
+                    // is_terminated
+
+
+                    // DO NOT use - 
+                    // BECAUSE = there could be bill generated for FUTURE/Advance/Ahead payments - 
+                    // so those payments could have "END_DATE" that is greater than "TODAY's Date (i.e. $endDate = Carbon::today();)"
+                    // SO this exception will break our logic, NEVER use this 
+                    // if ($endDate /* Carbon::now() */->lt($invoiceUnitEndDate)) {
+                    //     throw new \Exception('ERROR : - the end date in which your penalty will be calculated upto should be greater than the start date from your invoice will be calculated after. (i.e. the penalty generation date[end date] should always be greater than the last bill generation date)');
+                    // }
+
+
+                    
+
+                    // $invoiceUnitEndDateEndOfMonth = $invoiceUnitEndDate->copy()->endOfMonth(); // 2025-02-28
+
+
+                    // FOR NOW lets NOT check this IF condition
+                    //
+                    // this condition could HAPPEN IF
+                    //          if the service is TERMINATED or
+                    //          if the service is ended NORMALLY at the end date
+                    //
+                    //
+                    // so if the service is NOT terminated  - or -  NOT ended normally
+                    //      we must return ERROR if the following if condition becomes true
+                    //
+                    // if ($invoiceUnitEndDate->ne($invoiceUnitEndDateEndOfMonth)) {
+                    //     throw new \Exception('error, the last invoice end date must be equal to the end of the month.  i.e. the last invoice should have been paid until the end of that month, unless the enterprize service for that payer is terminated correctly, So in your case we are assuming the service you selected now is terminated');
+                    //     // or we can handle it even if the last invoice payment end date is not at the end of that month, by checking the following if 
+                    //             // if ($lastInvoiceEndDate->ne($invoiceUnitEndDateEndOfMonth)) { 
+                    //                     // and if true = calculate the payment of the rest of the days of that month by using (the daily price that we will calculate)
+                    //                 // }
+
+                    // }
+
+
+
+                    // PENALTY price
+                    $penaltyPriceForThisLot = 0;
+
+                    // PRINCIPAL price
+                    $principalPriceForThisLot = $invoiceUnit?->assetUnit?->price_principal;
+                    
+                    //
+                    // $penaltyStartDate = $monthEndOfThisMonth_UsedToCheck_AgainstPenalty + $penaltyStartsAfterDays;
+                    $penaltyStartDate = $invoiceUnitEndDate->copy()->addDays($penaltyStartsAfterDays);   
+
+                    //
+                    // if ($endDate > $penaltyStartDate) {
+                    if ($endDate->gt($penaltyStartDate)) {
+                        
+                        // METHOD 1
+                        if ($invoiceUnit?->assetUnit?->penalty?->penalty_type === Penalty::PENALTY_TYPE_DAILY) {
+
+                            $percentOfPrincipalPrice = $invoiceUnit?->assetUnit?->penalty?->percent_of_principal_price;
+                            $daysInCurrentMonth = $invoiceUnitEndDate->daysInMonth;
+                            $penaltyPerDay = ($principalPriceForThisLot / $daysInCurrentMonth) * $percentOfPrincipalPrice;
+
+
+                            // $numberOfPenaltyDays = $endDate - $penaltyStartDate;
+                            $numberOfPenaltyDays = $endDate->diffInDays($penaltyStartDate);
+                            $penaltyPriceForThisLot = $numberOfPenaltyDays * $penaltyPerDay;        // $penaltyPerDay = [ principal price / number of days in this Term (i.e. month) ] * $penalty->percent_of_principal_price
+                        }
+
+                        // METHOD 1
+                        if ($invoiceUnit->assetUnit->penalty->penalty_type === Penalty::PENALTY_TYPE_FLAT) {
+
+                            $percentOfPrincipalPrice = $invoiceUnit?->assetUnit?->penalty?->percent_of_principal_price;
+
+                            $penaltyPriceForThisLot = $principalPriceForThisLot * $percentOfPrincipalPrice;
+                        }
+
+
+
+                        
+                    }
+
+
+
+                    $updated = $invoiceUnit->update([
+                        'penalty' => $penaltyPriceForThisLot,
+                    ]);
+
+                    if (!$updated) {
+                        throw new \Exception('Failed to update penalty for invoice ID ' . $invoiceUnit->id);
+                    }
+
+
+                    
+                }
+                
+            });
+
+
+            return [
+                'success' => true,
+                'message' => 'All penalties updated successfully.',
+            ];
+
+        } catch (\Exception $e) {
+
+            Log::error('Penalty update failed', ['error' => $e->getMessage()]);
+
+            return [
+                'success' => false,
+                'message' => 'Penalty update failed.',
+                'error' => $e->getMessage(),
+            ];
+        }
+
+        
+
+
+
+
+    }
+
+
+
+    /**
+     * Penalty will only be generated/Updated for the already generated invoices/bills ONLY (those already generaged  Bills/invoices should also be UNPAID invoices)
+     * 
+     * so NO new invoice/bill will be generated here
+     * 
+     * Penalty will be Updated for
+     *      1. AssetUnits  -> with payment_status = (PAYMENT_STARTED & PAYMENT_LAST)
+     *      1. Invoices    -> with status         = (NOT_PAID)
+     * 
+     */
+    public function updatePenaltyForSingleAssetUnitForSinglePayer($assetUnit)
+    {
+
+
+
+    }
+
+
+
+
     /**
      * Penalty will only be generated/Updated for the already generated invoices/bills ONLY (those already generaged  Bills/invoices should also be UNPAID invoices)
      * 
      * so NO new invoice/bill will be generated here
      * 
      */
-    public function updatePenalty($assetUnit /*  */ )
+    public function updatePenaltyPrototype()
     {
+
+        // i.e. the below code does UPDATE PENALTY Operation for INVOICEs under          
+        //                      ||                                            1. a SINGLE AssetUnit           
+        //                      ||                                            2. a SINGLE payer
+        //                      ||
+        //                      \/
+
+        $assetUnit = AssetUnit::find(10089);
+
         $request[] = "";
 
 
@@ -591,7 +876,7 @@ class InvoiceUnitService
 
 
 
-            $unpaidInvoices = $assetUnit->invoices()
+            $unpaidInvoices = $assetUnit->invoiceUnits()
                 ->where('status', 'NOT_PAID')
                 ->get();
 
@@ -657,10 +942,13 @@ class InvoiceUnitService
 
 
 
+
+            
+
+
             //
-            // THE BELOW CODE IS USLESS - - - I THINK IT IS USELESS, DO NOT USE THE BELOW CODE I THINK
             //
-            //  -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+            // ******************************************************************************************************************************************************************************************************************************************
 
             // i.e. and some assetUnits does NOT have END date, they are infinite // Ex. - EDIR,    - Rent without contract
             // i.e. some assetUnits HAVE END DATE , so they are finite            // Ex. - EKUB, ,  - Rent with contract that have end date 
@@ -673,11 +961,29 @@ class InvoiceUnitService
                 $assetUnitEndDate = Carbon::parse($assetUnit->end_date);
 
 
+                // this is WRONG IF condition,  [ - NOT used - ] - [ DO NOT use ]
+                // Because the payer could pay his due , even after the service end_date passes, 
+                //             payer also could ask bill generation even after the service end_date passes
+                //             he could also be given penalty even after the service end_date passes, and the penalty will be generated long after the actual service end_date , IF he does NOT pay his due
+                //
+                //
+                //  WHAT WE SHOULD DO IS
+                //          1. BIll generation      = upto $assetUnit->end_date
+                //          2. Penalty Generation   = upto NOW() / upto today() - - - i.e. ( upto Carbon::now() )
+                //
                 // the end date the user inserts OR now() is greater than the date where the Actual enterprise ends,  then we should return error
                 if ($endDate->gt($assetUnitEndDate)) {
                     return "the bill calculation date in which calculation will be done upto must always be less than the date the Actual service ends";
                 }
             }
+            // ******************************************************************************************************************************************************************************************************************************************
+
+
+
+
+
+
+
 
 
             // from customer_services table
@@ -689,7 +995,7 @@ class InvoiceUnitService
             $lastInvoice = $assetUnit->invoices()->latest()->first();
             $lastInvoiceEndDate = Carbon::parse($lastInvoice->end_date); // 2025-02-28
 
-            if ($endDate->lte($lastInvoiceEndDate)) {
+            if ($endDate /* Carbon::now() */->lt($lastInvoiceEndDate)) {
                 return "ERROR : - the end date in which your penalty will be calculated upto should be greater than the start date from your invoice will be calculated after. (i.e. the penalty generation date[end date] should always be greater than the last bill generation date)";
             }
 
@@ -719,7 +1025,7 @@ class InvoiceUnitService
                     
             $monthEndOfThisMonth_UsedToCheck_AgainstPenalty = $current->copy()->endOfMonth();
             //
-            $penaltyStartDate = $monthEndOfThisMonth_UsedToCheck_AgainstPenalty + $penaltyStartsAfter; // this calculation wasted resource // but there is nothing you can do it is essential for the following if
+            $penaltyStartDate = $monthEndOfThisMonth_UsedToCheck_AgainstPenalty + $penaltyStartsAfter; // the COMMENT is WRONG- this calculation wasted resource // but there is nothing you can do it is essential for the following if
 
 
             //

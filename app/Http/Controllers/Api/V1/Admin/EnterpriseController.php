@@ -27,7 +27,7 @@ class EnterpriseController extends Controller
         $enterprisesBuilder = EnterpriseFilterService::applyEnterpriseFilter($enterprisesBuilder, $request->all());
 
         $enterprises = $enterprisesBuilder
-            ->with(['address'])
+            ->with(['media', 'address'])
             ->latest()
             ->paginate(FilteringService::getPaginate($request));
 

@@ -34,7 +34,14 @@ class InvoiceUnitController extends Controller
 
         $invoiceUnitService = new InvoiceUnitService();
 
-        $invoiceUnitServiceReturnValue = $invoiceUnitService->updatePenalty($request);
+        $penaltyUpdateResult = $invoiceUnitService->updatePenaltyForMultipleAssetUnitsForSinglePayer();
+
+        if ($penaltyUpdateResult['success'] !== true) {
+            return response()->json([
+                'message' => $penaltyUpdateResult['message'],
+                'error' => $penaltyUpdateResult['error'],
+            ], 422);
+        }
 
         //
         //
@@ -56,11 +63,11 @@ class InvoiceUnitController extends Controller
     public function store(StoreInvoiceUnitRequest $request)
     {
         //
-        // $var = DB::transaction(function () {
+        $var = DB::transaction(function () {
             
-        // });
+        });
 
-        // return $var;
+        return $var;
     }
 
     /**

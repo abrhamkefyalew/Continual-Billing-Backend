@@ -101,14 +101,14 @@ return [
 
         // the following users providers will be usable when their Models are created
         // // so are commented temporarily // abrham remember to uncomment later when their Models are created
-        // 'enterprise_users' => [
-        //     'driver' => 'eloquent',
-        //     'model' => App\Models\EnterpriseUser::class,
-        // ],
-        // 'payers' => [
-        //     'driver' => 'eloquent',
-        //     'model' => App\Models\Payer::class,
-        // ],
+        'enterprise_users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\EnterpriseUser::class,
+        ],
+        'payers' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Payer::class,
+        ],
 
 
     ],
@@ -152,18 +152,18 @@ return [
 
         // the following settings for the providers will be usable when their Models are created
         // // so are commented temporarily // abrham remember to uncomment later when their Models are created
-        // 'enterprise_users' => [
-        //     'provider' => 'enterprise_users',
-        //     'table' => 'password_reset_tokens',
-        //     'expire' => 60,
-        //     'throttle' => 60,
-        // ],
-        // 'payers' => [
-        //     'provider' => 'payers',
-        //     'table' => 'password_reset_tokens',
-        //     'expire' => 60,
-        //     'throttle' => 60,
-        // ],
+        'enterprise_users' => [
+            'provider' => 'enterprise_users',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'payers' => [
+            'provider' => 'payers',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
 
 
     ],

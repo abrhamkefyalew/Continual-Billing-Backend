@@ -26,10 +26,10 @@ class AssetPool extends Model
         // 'payer_id',  // for now this one will NOT be needed // abrham check
         'directive_id',
         'penalty_id',
+        'is_payment_by_term_end',
         'penalty_starts_after_days',
         'service_termination_penalty',
         'price_principal',
-        'payment_status',
         'start_date',
         'end_date',
         'original_end_date',
@@ -92,89 +92,94 @@ class AssetPool extends Model
 
 
 
-
-    
-
-    // constants
+    // THE following are NOT needed for asset_pool
+    //      Because Asset Pool is payed by multiple payers, so it does NOT have payment status as one,  
+    //      i.e. it is a collection of multiple payers,
     //
-    // payment constants
-    public const ASSET_POOL_PAYMENT_NOT_STARTED = 'PAYMENT_NOT_STARTED';
-    public const ASSET_POOL_PAYMENT_STARTED = 'PAYMENT_STARTED';
-    public const ASSET_POOL_PAYMENT_LAST = 'PAYMENT_LAST';
-    public const ASSET_POOL_PAYMENT_COMPLETED = 'PAYMENT_COMPLETED';
-    public const ASSET_POOL_PAYMENT_TERMINATED = 'PAYMENT_TERMINATED';
+    //  there should be a separate contracts table for that JOINs the PAYER - & - the AssetPool, 
+    //      in that contracts table we could hold & Handle the Following payment status logic
+    //
+    // // constants
+    // //
+    // // payment constants
+    // public const ASSET_POOL_PAYMENT_NOT_STARTED = 'PAYMENT_NOT_STARTED';
+    // public const ASSET_POOL_PAYMENT_STARTED = 'PAYMENT_STARTED';
+    // public const ASSET_POOL_PAYMENT_LAST = 'PAYMENT_LAST';
+    // public const ASSET_POOL_PAYMENT_COMPLETED = 'PAYMENT_COMPLETED';
+    // public const ASSET_POOL_PAYMENT_TERMINATED = 'PAYMENT_TERMINATED';
 
 
-    /**
-     * central list of Allowed AssetPool Payment Statuses as a mutable property
-     * 
-     */
-    public static $allowedTypes = [
-        self::ASSET_POOL_PAYMENT_NOT_STARTED,
-        self::ASSET_POOL_PAYMENT_STARTED,
-        self::ASSET_POOL_PAYMENT_LAST,
-        self::ASSET_POOL_PAYMENT_COMPLETED,
-        self::ASSET_POOL_PAYMENT_TERMINATED,
-    ];
+    // /**
+    //  * central list of Allowed AssetPool Payment Statuses as a mutable property
+    //  * 
+    //  */
+    // public static $allowedTypes = [
+    //     self::ASSET_POOL_PAYMENT_NOT_STARTED,
+    //     self::ASSET_POOL_PAYMENT_STARTED,
+    //     self::ASSET_POOL_PAYMENT_LAST,
+    //     self::ASSET_POOL_PAYMENT_COMPLETED,
+    //     self::ASSET_POOL_PAYMENT_TERMINATED,
+    // ];
 
 
-    /**
-     * Get validation rules using Rule::in with constants
-     */
-    public static function getRules(): array
-    {
-        //
-        return [
-            'payment_status' => [
-                'required', 'string', Rule::in(self::$allowedTypes),
-            ],
-        ];
-    }
+    // /**
+    //  * Get validation rules using Rule::in with constants
+    //  */
+    // public static function getRules(): array
+    // {
+    //     //
+    //     return [
+    //         'payment_status' => [
+    //             'required', 'string', Rule::in(self::$allowedTypes),
+    //         ],
+    //     ];
+    // }
 
 
-    /**
-     * Custom validation messages
-     */
-    public static function getMessages(): array
-    {
-        return [
-            'payment_status.in' => 'INVALID Asset Pool Payment Status. Allowed values are: ' . implode(', ', self::$allowedTypes) . '.',
-        ];
-    }
+    // /**
+    //  * Custom validation messages
+    //  */
+    // public static function getMessages(): array
+    // {
+    //     return [
+    //         'payment_status.in' => 'INVALID Asset Pool Payment Status. Allowed values are: ' . implode(', ', self::$allowedTypes) . '.',
+    //     ];
+    // }
 
 
 
-    /**
-     * Validate model data before doing WRITE Operation
-     * 
-     * The "booting" method of the model.
-     *
-     * Registers a saving event that validates model attributes before persisting.
-     * This ensures that only a validated data is written to Database during  - > save() / fill()->save() / create() / update() / updateOrCreate() operations.
-     * 
-     * But still NOT work for insert() and upsert() - Because these are Query Builder-level operations, bypassing Eloquent models entirely 
-     * 
-     * 
-     *  = > RECOMMENDED BECAUSE
-     *                      //
-     *                      - Triggers Validation and Writing to DB during - > i.e. save(), create(), update(), updateOrCreate(), fill() operations.
-     *                      - But still NOT work for insert() and upsert() - Because these are Query Builder-level operations, bypassing Eloquent models entirely, - so no events (and no validation) are triggered.
-     * 
-     *
-     * @return void
-     */
-    protected static function boot()
-    {
-        parent::boot();
+    // /**
+    //  * Validate model data before doing WRITE Operation
+    //  * 
+    //  * The "booting" method of the model.
+    //  *
+    //  * Registers a saving event that validates model attributes before persisting.
+    //  * This ensures that only a validated data is written to Database during  - > save() / fill()->save() / create() / update() / updateOrCreate() operations.
+    //  * 
+    //  * But still NOT work for insert() and upsert() - Because these are Query Builder-level operations, bypassing Eloquent models entirely 
+    //  * 
+    //  * 
+    //  *  = > RECOMMENDED BECAUSE
+    //  *                      //
+    //  *                      - Triggers Validation and Writing to DB during - > i.e. save(), create(), update(), updateOrCreate(), fill() operations.
+    //  *                      - But still NOT work for insert() and upsert() - Because these are Query Builder-level operations, bypassing Eloquent models entirely, - so no events (and no validation) are triggered.
+    //  * 
+    //  *
+    //  * @return void
+    //  */
+    // protected static function boot()
+    // {
+    //     parent::boot();
 
-        static::saving(function ($model) {
-            $validator = Validator::make($model->attributesToArray(), self::getRules(), self::getMessages());
+    //     static::saving(function ($model) {
+    //         $validator = Validator::make($model->attributesToArray(), self::getRules(), self::getMessages());
 
-            if ($validator->fails()) {
-                throw new \Exception($validator->errors()->first());
-            }
-        });
-    }
+    //         if ($validator->fails()) {
+    //             throw new \Exception($validator->errors()->first());
+    //         }
+    //     });
+    // }
+    
 
 
 }

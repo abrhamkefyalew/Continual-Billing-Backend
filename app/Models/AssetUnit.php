@@ -26,6 +26,7 @@ class AssetUnit extends Model
         'payer_id',
         'directive_id',
         'penalty_id',
+        'is_payment_by_term_end',
         'penalty_starts_after_days',
         'service_termination_penalty',
         'price_principal',

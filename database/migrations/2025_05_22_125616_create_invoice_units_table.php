@@ -43,9 +43,11 @@ return new class extends Migration
 
 
             // OPTIONAL Columns
-            //              // Less Likely for invoice_units table
+            //              // i.e. if we want to know important payment reasons i.e.  IT could be 
+            //              // - joining fee
+            //              //          // ADDITIONAL INFO = in this case ->  start_date='the day he joined'      end_date='end Date of the selected TERM (directive_type)'
             //
-            $table->string('reason')->nullable(); // we optionally write REASON of Payment 
+            $table->string('reason')->nullable(); // we optionally write REASON of Payment (i.e. JOINING fee, also if the penalty in this raw has an added price amount of Service Termination penalty fee[in this case we could remark that - it is Service termination fee & also we can put how much of the price is the service termination fee] )
             $table->longText('reason_description')->nullable(); // we optionally write REASON of Payment - // BUT we use this if the Reason of payment is LONGER
 
 
