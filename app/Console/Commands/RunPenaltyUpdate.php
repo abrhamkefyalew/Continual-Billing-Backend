@@ -30,6 +30,7 @@ class RunPenaltyUpdate extends Command
      */
     public function handle()
     {
+        // THIS COMMAND is NOT used currently
         //
         Log::info('Command run: app:run-penalty-update');
         // Log::info('Command run: penalty:update');
@@ -37,7 +38,7 @@ class RunPenaltyUpdate extends Command
 
 
         // RUN Penalty update for InvoiceUnit
-        (new InvoiceUnitService)->updatePenaltyForMultipleAssetUnitsForAllPayers(InvoiceUnit::whereNotNull('id')->get());
+        // (new InvoiceUnitService)->updatePenaltyForMultipleAssetUnitsForAllPayers(InvoiceUnit::whereNotNull('id')->get());
 
         // RUN PEnalty update for InvoicePool
         // (new InvoicePoolService)->updatePenaltyForMultipleAssetUnitsForAllPayers(InvoicePool::whereNotNull('id')->get());

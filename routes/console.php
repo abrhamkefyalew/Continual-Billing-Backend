@@ -38,8 +38,14 @@ Artisan::command('inspire', function () {
 
 //
 // STATIC Call
-Schedule::command('app:run-penalty-update')->everyMinute();
+Schedule::command('app:penalty-update-for-invoice-unit')->everyMinute();
+Schedule::command('app:penalty-update-for-invoice-pool')->everyTwoMinutes();
+
+
+// Schedule::command('app:run-penalty-update')->everyMinute();
 // Schedule::command('penalty:update')->everyMinute();
+
+
 
 // 
 // NON Static call  - CHECK First 
@@ -63,7 +69,7 @@ Schedule::command('app:run-penalty-update')->everyMinute();
 // STATIC Call
 Schedule::call(function () {
     
-    Log::info("scheduler has been run");
+    Log::info("scheduler for ten minutes has been run");
     // (new InvoiceUnitService)->updatePenalty(InvoiceUnit::whereNotNull('id')->get());
     
 })->everyTenMinutes();
