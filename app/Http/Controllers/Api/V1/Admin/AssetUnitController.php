@@ -51,7 +51,9 @@ class AssetUnitController extends Controller
      */
     public function show(AssetUnit $assetUnit)
     {
-        //
+        // $this->authorize('view', $assetUnit);
+        
+        return AssetUnitResource::make($assetUnit->load(['enterprise', 'assetMain', 'payer', 'directive', 'penalty']));
     }
 
     /**

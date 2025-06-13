@@ -51,7 +51,9 @@ class AssetPoolController extends Controller
      */
     public function show(AssetPool $assetPool)
     {
-        //
+        // $this->authorize('view', $assetPool);
+        
+        return AssetPoolResource::make($assetPool->load(['enterprise', 'assetMain', /* 'payer', */ 'directive', 'penalty']));
     }
 
     /**

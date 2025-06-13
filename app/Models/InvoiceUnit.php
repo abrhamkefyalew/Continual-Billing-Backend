@@ -28,6 +28,7 @@ class InvoiceUnit extends Model
         'end_date',
         'price',
         'penalty',
+        'number_of_penalty_days',
         'immune_to_penalty',
         'status',
         'paid_date',
@@ -50,7 +51,7 @@ class InvoiceUnit extends Model
         'paid_date' => 'date',
         'request_payload' => 'array', // USED
         'response_payload' => 'array', // USED
-        // 'response_payload' => 'json', // this works also
+        // 'response_payload' => 'json', // works also
     ];
 
 

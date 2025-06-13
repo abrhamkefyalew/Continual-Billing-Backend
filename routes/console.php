@@ -1,7 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,3 +19,74 @@ use Illuminate\Support\Facades\Artisan;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
+
+
+
+
+
+
+// ===================================================================================================================== SCHEDULE ===================================================================================================================== //
+
+
+
+
+
+// -------------------------------------------------------------------- SCHEDULE CALL (Command based) --------------------------------------------------------------------//
+
+// $schedule->command('inspire')->hourly();
+
+
+//
+// STATIC Call
+Schedule::command('app:penalty-update-for-invoice-unit')->everyMinute();
+Schedule::command('app:penalty-update-for-invoice-pool')->everyTwoMinutes();
+
+
+// Schedule::command('app:run-penalty-update')->everyMinute();
+// Schedule::command('penalty:update')->everyMinute();
+
+
+
+// 
+// NON Static call  - CHECK First 
+//
+// $schedule = new Schedule();
+// $schedule->command('app:run-penalty-update')->everyMinute();
+// $schedule->command('penalty:update')->everyMinute();
+
+
+// -------------------------------------------------------------------- end SCHEDULE CALL (Command based) --------------------------------------------------------------------//
+
+
+
+
+
+
+
+// -------------------------------------------------------------------- SCHEDULE CALL (Closure based) --------------------------------------------------------------------//
+
+
+// STATIC Call
+Schedule::call(function () {
+    
+    Log::info("scheduler for ten minutes has been run");
+    // (new InvoiceUnitService)->updatePenalty(InvoiceUnit::whereNotNull('id')->get());
+    
+})->everyTenMinutes();
+
+
+
+// closure-based schedule at specified time
+// Schedule::call(function () {
+//     Log::info('Closure scheduled task ran.');
+// })->dailyAt('10:00');
+
+// -------------------------------------------------------------------- end SCHEDULE CALL (Closure based) --------------------------------------------------------------------//
+
+
+
+
+// ===================================================================================================================== end SCHEDULE ===================================================================================================================== //
+
+
+

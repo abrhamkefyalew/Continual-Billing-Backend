@@ -28,7 +28,7 @@ class AssetMainController extends Controller
         $assetMainsBuilder = AssetMainFilterService::applyAssetMainFilter($assetMainsBuilder, $request->all());
 
         $assetMains = $assetMainsBuilder
-            ->with(['enterprise', 'address'])
+            ->with(['address', 'media', 'enterprise'])
             ->latest()
             ->paginate(FilteringService::getPaginate($request));
 
@@ -43,11 +43,11 @@ class AssetMainController extends Controller
     public function store(StoreAssetMainRequest $request)
     {
         //
-        // $var = DB::transaction(function () {
+        $var = DB::transaction(function () {
             
-        // });
+        });
 
-        // return $var;
+        return $var;
     }
 
     /**
@@ -57,7 +57,7 @@ class AssetMainController extends Controller
     {
         // $this->authorize('view', $assetMain);
         
-        return AssetMainResource::make($assetMain->load(['media', 'address', 'enterprise']));
+        return AssetMainResource::make($assetMain->load(['address', 'media', 'enterprise']));
     }
 
     /**

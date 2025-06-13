@@ -29,7 +29,7 @@ class Address extends Model
 
     protected $casts = [
         'relative_location' => 'array', // USED
-        // 'relative_location' => 'json', // this works also
+        // 'relative_location' => 'json', // works also
     ];
 
     public function addressable()

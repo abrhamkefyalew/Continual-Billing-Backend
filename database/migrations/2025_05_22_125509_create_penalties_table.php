@@ -41,7 +41,7 @@ return new class extends Migration
             $table->unique(['penalty_type', 'percent_of_principal_price'] /*, 'unique_penalty_price' */ );
 
 
-            $table->boolean('is_active')->default(1);
+            $table->boolean('is_active')->default(1); // if any ACTIVE(ONGOING) AssetUnit / AssetPool / (i.e. enterprise Service) is using this penalty , it should NOT be DEACTIVATED
 
 
             // ABRHAM check

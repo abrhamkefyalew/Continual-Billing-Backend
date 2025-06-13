@@ -4,7 +4,10 @@ namespace App\Exceptions;
 
 use Throwable;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -53,4 +56,68 @@ class Handler extends ExceptionHandler
 
 
     }
+
+
+
+    /**
+     * ADDED by ME / ABRHAM: Override the render method to catch ModelNotFoundException directly
+     * 
+     * OPTIONAL
+     */
+    // public function render($request, Throwable $exception)
+    // {
+    //     // dd("render method reached");
+
+    //     // FIX: Handle Eloquent model not found exception
+    //     if ($exception instanceof ModelNotFoundException) {
+    //         if ($request->is('api/*')) {
+    //             return response()->json(['message' => 'Record not found!'], 404);
+    //         }
+    //     }
+
+    //     // FIX: Optionally handle 404 route not found explicitly here too
+    //     if ($exception instanceof NotFoundHttpException) {
+    //         if ($request->is('api/*')) {
+    //             return response()->json(['message' => 'Route not found!'], 404);
+    //         }
+    //     }
+
+    //     // OPTIONAL: Authentication failure
+    //     if ($exception instanceof AuthenticationException) {
+    //         if ($request->is('api/*')) {
+    //             return response()->json(['message' => 'Unauthenticated.'], 401);
+    //         }
+    //     }
+
+    //     // OPTIONAL: Access denied
+    //     if ($exception instanceof AuthorizationException) {
+    //         if ($request->is('api/*')) {
+    //             return response()->json(['message' => 'You are not authorized to access this resource.'], 403);
+    //         }
+    //     }
+
+
+
+    //     return parent::render($request, $exception);
+    // }
+
+
+
+
+    /**
+     * ADDED by ME / ABRHAM: Log all unhandled exceptions with class, message, and trace.
+     */
+    public function report(Throwable $exception): void
+    {
+        // dd("report method reached");
+        
+        Log::error("Unhandled exception: " . get_class($exception), [
+            'message' => $exception->getMessage(),
+            'trace' => $exception->getTraceAsString(),
+        ]);
+
+        parent::report($exception);
+    }
+
+
 }

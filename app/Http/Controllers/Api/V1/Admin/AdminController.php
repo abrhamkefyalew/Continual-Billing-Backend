@@ -90,7 +90,7 @@ class AdminController extends Controller
 
 
         //
-        // $this->authorize('viewAny', Admin::class);
+        $this->authorize('viewAny', Admin::class);
 
         $admin = Admin::whereNotNull('id')->with('media', 'roles');
         

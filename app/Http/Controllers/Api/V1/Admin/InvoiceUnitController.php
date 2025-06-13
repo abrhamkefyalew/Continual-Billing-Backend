@@ -11,6 +11,7 @@ use App\Services\Api\V1\FilteringService;
 use App\Services\Api\V1\Filters\InvoiceUnitFilterService;
 use App\Http\Requests\Api\V1\AdminRequests\StoreInvoiceUnitRequest;
 use App\Http\Requests\Api\V1\AdminRequests\UpdateInvoiceUnitRequest;
+use App\Services\Api\V1\ModelServices\InvoiceUnit\InvoiceUnitService;
 use App\Http\Resources\Api\V1\InvoiceUnitResources\InvoiceUnitResource;
 
 class InvoiceUnitController extends Controller
@@ -22,7 +23,30 @@ class InvoiceUnitController extends Controller
     {
         // $this->authorize('viewAny', InvoiceUnit::class);
 
+        
+
         $invoiceUnitsBuilder = InvoiceUnit::query();
+
+
+        // HERE WE should call the updatePenalty() Function from service
+        //          // updates the UNPAID invoices to calculate additional penalty with the recent date
+        //
+
+        $invoiceUnitService = new InvoiceUnitService();
+
+        $penaltyUpdateResult = $invoiceUnitService->updatePenaltyForMultipleAssetUnitsForSinglePayer();
+
+        if ($penaltyUpdateResult['success'] !== true) {
+            return response()->json([
+                'message' => $penaltyUpdateResult['message'],
+                'error' => $penaltyUpdateResult['error'],
+            ], 422);
+        }
+
+        //
+        //
+
+
         $invoiceUnitsBuilder = InvoiceUnitFilterService::applyInvoiceUnitFilter($invoiceUnitsBuilder, $request);
 
         $invoiceUnits = $invoiceUnitsBuilder
@@ -39,11 +63,11 @@ class InvoiceUnitController extends Controller
     public function store(StoreInvoiceUnitRequest $request)
     {
         //
-        // $var = DB::transaction(function () {
+        $var = DB::transaction(function () {
             
-        // });
+        });
 
-        // return $var;
+        return $var;
     }
 
     /**
@@ -51,7 +75,9 @@ class InvoiceUnitController extends Controller
      */
     public function show(InvoiceUnit $invoiceUnit)
     {
-        //
+        // $this->authorize('view', $invoiceUnit);
+        
+        return InvoiceUnitResource::make($invoiceUnit->load(['assetUnit']));
     }
 
     /**

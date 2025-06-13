@@ -23,6 +23,7 @@ class AssetUnitFilterService
             'payer_id_search' => 'payer_id',
             'directive_id_search' => 'directive_id',
             'penalty_id_search' => 'penalty_id',
+            'is_payment_by_term_end_search' => 'is_payment_by_term_end',
             'is_terminated_search' => 'is_terminated',
             'payer_can_terminate_search' => 'payer_can_terminate',
             'is_engaged_search' => 'is_engaged',

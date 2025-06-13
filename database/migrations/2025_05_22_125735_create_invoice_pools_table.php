@@ -32,6 +32,8 @@ return new class extends Migration
             // these TWO will be added during payment
             $table->decimal('price', 10, 2); // is (the date differences multiplied by the asset_unit principal_price)
             $table->decimal('penalty', 10, 2)->default(0); // is the calculated penalty price // during payment it will be added with the price column 
+            $table->integer('number_of_penalty_days');  // check this column always, 
+                                                        // = do NOT use it for Multiplication (i.e. to get penalty) if it is 0 , DOUBLE CHECK if you do Multiplication using this column
 
             $table->boolean('immune_to_penalty')->default(0);
 
@@ -42,9 +44,11 @@ return new class extends Migration
 
 
             // OPTIONAL Columns
-            //              // More likely for invoice_pools table
+            //              // i.e. if we want to know important payment reasons i.e.  IT could be 
+            //              // - joining fee
+            //              //          // ADDITIONAL INFO = in this case ->  start_date='the day he joined'      end_date='end Date of the selected TERM (directive_type)'
             //
-            $table->string('reason')->nullable(); // we optionally write REASON of Payment - (i.e. is it joining fee - or - is it future pay) 
+            $table->string('reason')->nullable(); // we optionally write REASON of Payment (i.e. JOINING fee, also if the penalty in this raw has an added price amount of Service Termination penalty fee[in this case we could remark that - it is Service termination fee & also we can put how much of the price is the service termination fee] )
             $table->longText('reason_description')->nullable(); // we optionally write REASON of Payment - (i.e. is it joining fee - or - is it future pay) // BUT we use this if the Reason of payment is LONGER
 
 

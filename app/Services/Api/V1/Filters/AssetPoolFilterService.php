@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 class AssetPoolFilterService
 {
 
-
     /**
      * Applies filters to the AssetPool query based on request input.
      *
@@ -24,6 +23,7 @@ class AssetPoolFilterService
             'payer_id_search' => 'payer_id',
             'directive_id_search' => 'directive_id',
             'penalty_id_search' => 'penalty_id',
+            'is_payment_by_term_end_search' => 'is_payment_by_term_end',
             'is_terminated_search' => 'is_terminated',
             'payer_can_terminate_search' => 'payer_can_terminate',
             'is_engaged_search' => 'is_engaged',
@@ -55,28 +55,35 @@ class AssetPoolFilterService
 
         
 
-
+        // THE following are NOT needed for asset_pool
+        //      Because Asset Pool is payed by multiple payers, so it does NOT have payment status as one,  
+        //      i.e. it is a collection of multiple payers,
+        //
+        //  there should be a separate contracts table for that JOINs the PAYER - & - the AssetPool, 
+        //      in that contracts table we could hold & Handle the Following payment status logic
+        //
+        //
         // Validate and apply 'payment_status_search'
-        if (isset($request['payment_status_search']) && filled($request['payment_status_search'])) {
-            $paymentStatusSearch = $request->payment_status_search;
+        // if (isset($request['payment_status_search']) && filled($request['payment_status_search'])) {
+        //     $paymentStatusSearch = $request->payment_status_search;
             
-            // if (!in_array($paymentStatusSearch, \App\Models\AssetPool::$allowedTypes, true)) {
-            //     abort(400, 'Invalid value for payment_status_search');
-            // }
+        //     // if (!in_array($paymentStatusSearch, \App\Models\AssetPool::$allowedTypes, true)) {
+        //     //     abort(400, 'Invalid value for payment_status_search');
+        //     // }
 
 
-            if (in_array($paymentStatusSearch, \App\Models\AssetPool::$allowedTypes, true)) {
+        //     if (in_array($paymentStatusSearch, \App\Models\AssetPool::$allowedTypes, true)) {
                 
-                if (is_null($paymentStatusSearch)) {
-                    $builder->whereNull('payment_status');
-                } else {
-                    $builder->where('payment_status', $paymentStatusSearch);
-                }
+        //         if (is_null($paymentStatusSearch)) {
+        //             $builder->whereNull('payment_status');
+        //         } else {
+        //             $builder->where('payment_status', $paymentStatusSearch);
+        //         }
 
-            }
+        //     }
 
             
-        }
+        // }
 
         return $builder;
     }
