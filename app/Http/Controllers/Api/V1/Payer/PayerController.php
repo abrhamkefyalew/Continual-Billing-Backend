@@ -75,7 +75,7 @@ class PayerController extends Controller
             
 
             if ($request->has('country') || $request->has('city')) {
-                if ($payer->address) {
+                if ($payer?->address) {
                     $payer->address()->update([
                         'country' => $request->input('country'),
                         'city' => $request->input('city'),
