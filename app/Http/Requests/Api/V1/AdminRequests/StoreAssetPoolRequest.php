@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\V1\AdminRequests;
 
+use App\Models\AssetPool;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreAssetPoolRequest extends FormRequest
@@ -12,6 +13,8 @@ class StoreAssetPoolRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+
+        return $this->user()->can('create', AssetPool::class);
     }
 
     /**

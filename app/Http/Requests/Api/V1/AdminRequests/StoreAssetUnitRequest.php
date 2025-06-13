@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\V1\AdminRequests;
 
+use App\Models\AssetUnit;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreAssetUnitRequest extends FormRequest
@@ -12,6 +13,8 @@ class StoreAssetUnitRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+
+        // return $this->user()->can('create', AssetUnit::class);
     }
 
     /**
