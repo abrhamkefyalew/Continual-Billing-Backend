@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\V1\AdminRequests;
 
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateDirectiveRequest extends FormRequest
@@ -12,6 +13,8 @@ class UpdateDirectiveRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+
+        // return $this->user()->can('update', $this->directive);
     }
 
     /**
@@ -23,6 +26,15 @@ class UpdateDirectiveRequest extends FormRequest
     {
         return [
             //
+            'directive_type' => [
+                'sometimes', 
+                'string', 
+                Rule::unique('directives')->ignore($this->directive->id),
+            ],  // should NOT be nullable // since directive_type can NOT be updated to be null
+
+            'is_active' => ['sometimes', 'boolean',],
+
+            'name' => ['sometimes', 'nullable', 'string'],  // should be nullable // since name can be updated to be empty or null
         ];
     }
 }

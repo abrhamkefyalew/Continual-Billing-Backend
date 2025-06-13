@@ -12,6 +12,7 @@ use App\Services\Api\V1\Filters\PenaltyFilterService;
 use App\Http\Requests\Api\V1\AdminRequests\StorePenaltyRequest;
 use App\Http\Resources\Api\V1\PenaltyResources\PenaltyResource;
 use App\Http\Requests\Api\V1\AdminRequests\UpdatePenaltyRequest;
+use App\Http\Resources\Api\V1\DirectiveResources\DirectiveResource;
 
 class PenaltyController extends Controller
 {
@@ -38,11 +39,15 @@ class PenaltyController extends Controller
     public function store(StorePenaltyRequest $request)
     {
         //
-        // $var = DB::transaction(function () {
-            
-        // });
+        $var = DB::transaction(function () use ($request) {
+           
+            $penalty = Penalty::create($request->validated());
 
-        // return $var;
+            return PenaltyResource::make($penalty);
+
+        });
+
+        return $var;
     }
 
     /**
@@ -61,11 +66,15 @@ class PenaltyController extends Controller
     public function update(UpdatePenaltyRequest $request, Penalty $penalty)
     {
         //
-        // $var = DB::transaction(function () {
+        $var = DB::transaction(function () use ($request, $penalty) {
             
-        // });
+            $penalty->update($request->validated());
 
-        // return $var;
+            return PenaltyResource::make($penalty);
+            
+        });
+
+        return $var;
     }
 
     /**

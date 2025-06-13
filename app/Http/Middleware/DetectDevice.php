@@ -10,6 +10,9 @@ class DetectDevice
 {
     /**
      * Handle an incoming request.
+     * 
+     * abrham remember
+     * DETECTING devices is OPTIONAL // this middleware could be disabled at will in bootstrap/app.php
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
