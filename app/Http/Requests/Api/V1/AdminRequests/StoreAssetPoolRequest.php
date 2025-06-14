@@ -14,7 +14,7 @@ class StoreAssetPoolRequest extends FormRequest
     {
         return true;
 
-        return $this->user()->can('create', AssetPool::class);
+        // return $this->user()->can('create', AssetPool::class);
     }
 
     /**

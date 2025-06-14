@@ -13,7 +13,7 @@ class UpdateAssetUnitRequest extends FormRequest
     {
         return true;
 
-        return $this->user()->can('update', $this->assetUnit);
+        // return $this->user()->can('update', $this->assetUnit);
     }
 
     /**

@@ -23,7 +23,11 @@ return new class extends Migration
             $table->foreignId('directive_id')->constrained('directives');
             $table->foreignId('penalty_id')->constrained('penalties');
 
+            
+            $table->integer('penalty_starts_after_days');    // this should ONLY be number of days // any integer/number stored in this column is considered as number of days
+            $table->decimal('service_termination_penalty', 10, 2); // this penalty will be calculated When/IF the payer want to terminate his service of his asset usage
 
+            $table->decimal('price_principal', 10, 2);
             $table->boolean('is_payment_by_term_end')->default(1);
                                             //
                                             // 1. this column is checked for the following directive types ONLY =
@@ -73,16 +77,6 @@ return new class extends Migration
                                                     
                                             //}
 
-
-                                            
-            
-            $table->integer('penalty_starts_after_days');    // this should ONLY be number of days // any integer/number stored in this column is considered as number of days
-            $table->decimal('service_termination_penalty', 10, 2); // this penalty will be calculated When/IF the payer want to terminate his service of his asset usage
-
-            $table->decimal('price_principal', 10, 2);
-
-
-
             // THE following column is NOT needed for asset_pool
             //      Because Asset Pool is payed by multiple payers, so it does NOT have payment status as one,  
             //      i.e. it is a collection of multiple payers,
@@ -108,7 +102,7 @@ return new class extends Migration
             $table->boolean('payer_can_terminate')->default(0);
 
 
-            $table->boolean('is_engaged')->default(0); // this is for: - is the asset CURRENTLY Under-Way (asset Unit) - or - Under-Use (Asset Pool)?
+            $table->boolean('is_engaged')->default(0); // this is for: - is the asset/property CURRENTLY Under-Use by another party (Asset Unit)?
                                                                                                                     //
                                                                                                                     // AssetPool
                                                                                                                             // 0 = The Asset (i.e. ekub or edir) is CURRENTLY NOT underway.  - the group asset/service/event is NOT started   - is used to END/finish the event (i.e. group asset) 

@@ -39,11 +39,11 @@ class AssetUnitController extends Controller
     public function store(StoreAssetUnitRequest $request)
     {
         //
-        // $var = DB::transaction(function () {
+        $var = DB::transaction(function () {
             
-        // });
+        });
 
-        // return $var;
+        return $var;
     }
 
     /**
