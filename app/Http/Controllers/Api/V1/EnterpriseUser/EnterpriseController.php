@@ -101,7 +101,7 @@ class EnterpriseController extends Controller
             
             $updatedEnterprise = Enterprise::find($enterprise->id);
 
-            return EnterpriseResource::make($updatedEnterprise->load('media', 'address', 'contracts' /*, 'orders'*/ , 'enterpriseUsers'));
+            return EnterpriseResource::make($updatedEnterprise->load(['media', 'address', 'enterpriseUsers']));
 
         });
 

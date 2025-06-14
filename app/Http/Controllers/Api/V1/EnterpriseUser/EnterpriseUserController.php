@@ -25,7 +25,7 @@ class EnterpriseUserController extends Controller
         
         $enterprise = EnterpriseUser::where('enterprise_id', $enterpriseUser->enterprise_id);
         
-        $enterpriseData = $enterprise->with('vehicleName', 'vehicle', 'driver', 'contractDetail')->latest()->paginate(FilteringService::getPaginate($request));       // this get multiple orders of the enterprise
+        $enterpriseData = $enterprise->with(['media', 'address', 'enterprise'])->latest()->paginate(FilteringService::getPaginate($request));       // this get multiple orders of the enterprise
 
         return EnterpriseUserResource::collection($enterpriseData);
     }
@@ -80,7 +80,7 @@ class EnterpriseUserController extends Controller
             }
 
 
-            return EnterpriseUserResource::make($enterpriseUser->load('media', 'enterprise', 'address'));
+            return EnterpriseUserResource::make($enterpriseUser->load(['media', 'address', 'enterprise']));
             
         });
 
@@ -165,7 +165,7 @@ class EnterpriseUserController extends Controller
             
             $updatedEnterpriseUser = EnterpriseUser::find($enterpriseUser->id);
 
-            return EnterpriseUserResource::make($updatedEnterpriseUser->load('media', 'enterprise', 'address'));
+            return EnterpriseUserResource::make($updatedEnterpriseUser->load(['media', 'address', 'enterprise']));
 
         });
 
