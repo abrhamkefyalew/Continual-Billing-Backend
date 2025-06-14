@@ -25,7 +25,7 @@ class EnterpriseUserController extends Controller
         
         $enterprise = EnterpriseUser::where('enterprise_id', $enterpriseUser->enterprise_id);
         
-        $enterpriseData = $enterprise->with(['media', 'address', 'enterprise'])->latest()->paginate(FilteringService::getPaginate($request));       // this get multiple orders of the enterprise
+        $enterpriseData = $enterprise->with(['media', 'address', 'enterprise'])->latest()->paginate(FilteringService::getPaginate($request));       // this get multiple enterpriseUsers of the enterprise
 
         return EnterpriseUserResource::collection($enterpriseData);
     }
