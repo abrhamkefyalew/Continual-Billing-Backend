@@ -8,7 +8,7 @@ use App\Traits\Api\V1\GetMedia;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\Api\V1\AddressResources\AddressResource;
 
-class PayerForPayerResource extends JsonResource
+class PayerForEnterpriseResource extends JsonResource
 {
     use GetMedia;
     
