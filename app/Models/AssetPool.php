@@ -21,9 +21,9 @@ class AssetPool extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        // 'payer_id',  // for now this one will NOT be needed, putting this will make one collective/group asset be rented/contracted by a single payer   // abram check    // I will use a separate contract table to put in a single payer info for that assetPool
         'enterprise_id',
         'asset_main_id',
-        // 'payer_id',  // for now this one will NOT be needed, putting this will make one collective/group asset be rented/contracted by a single payer   // abram check    // I will use a separate contract table to put in a single payer info for that assetPool
         'directive_id',
         'penalty_id',
         'penalty_starts_after_days',

@@ -22,9 +22,9 @@ class AssetUnit extends Model
      */
     protected $fillable = [
         'asset_unit_code',
+        'payer_id',
         'enterprise_id',
         'asset_main_id',
-        'payer_id',
         'directive_id',
         'penalty_id',
         'penalty_starts_after_days',

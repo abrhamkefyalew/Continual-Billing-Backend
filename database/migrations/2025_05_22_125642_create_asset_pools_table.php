@@ -15,11 +15,13 @@ return new class extends Migration
         Schema::create('asset_pools', function (Blueprint $table) {
             $table->id()->from(10000);
 
+            $table->foreignId('payer_id')->nullable()->constrained('payers'); // for now this one will NOT be needed // i have removed it from the fillable list in AssetPool Model (abrham check)
+
             // since this project is NOT property/asset management, in the future this project might use another property/asset management system 
             // this means NO asset_mains table, so the enterprise_id exists here to correctly identify who owns the property at such times
             $table->foreignId('enterprise_id')->constrained('enterprises');
             $table->foreignId('asset_main_id')->constrained('asset_mains');
-            $table->foreignId('payer_id')->nullable()->constrained('payers'); // for now this one will NOT be needed // i have removed it from the fillable list in AssetPool Model (abrham check)
+            
             $table->foreignId('directive_id')->constrained('directives');
             $table->foreignId('penalty_id')->constrained('penalties');
 
