@@ -157,7 +157,7 @@ class AssetUnitController extends Controller
 
                     // todays date  // it should be moved out of the foreach loop // check abrham samson
                     // Get today's date at midnight (00:00:00)
-                    $today = Carbon::today(); // Already startOfDay (// Already 00:00:00), but consistent
+                    $today = Carbon::today(); // Already startOfDay (// Already 00:00:00), but consistent 
 
 
 
