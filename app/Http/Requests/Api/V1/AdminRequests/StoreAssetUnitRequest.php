@@ -39,6 +39,7 @@ class StoreAssetUnitRequest extends FormRequest
 
 
             'assetUnits.*.asset_main_id' => 'required|integer|exists:asset_mains,id',
+            
             'assetUnits.*.directive_id' => 'required|integer|exists:directives,id',
             'assetUnits.*.penalty_id' => 'required|integer|exists:penalties,id',
 

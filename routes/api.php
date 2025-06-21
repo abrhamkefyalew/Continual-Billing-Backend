@@ -55,6 +55,10 @@ Route::get('/test-handler', function () {
     return get_class(app()->make(Illuminate\Contracts\Debug\ExceptionHandler::class));
 });
 
+Route::get('test-helper', function () {
+    return slugify_string("Café Déjà Vu! — Hello World 2025");
+});
+
 
 
 //
