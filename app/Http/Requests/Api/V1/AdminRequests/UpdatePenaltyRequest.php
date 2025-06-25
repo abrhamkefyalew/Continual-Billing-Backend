@@ -25,11 +25,24 @@ class UpdatePenaltyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'penalty_type' => [
-                'sometimes', 
-                'string',
-                Rule::in(\App\Models\Penalty::allowedTypes()),
-            ],
+            // abrham check/remember
+            //
+            // Can be  updated - IF it NOT being used by any active AssetUnits/AssetMains/ORDERs in the system
+            //      BUT = needs additional Logic in the Controller/service - to check this and other things
+            //
+            // - BUT - 
+            //
+            // SHOULD this be updated - IF it is being used by active AssetUnits/AssetMains/ORDERs in the system ?
+            //      my current thought NO
+            //      but i could find ways to address issue  - or -  handle it in way so that i can update it even if it is being actively being use
+            //
+            //
+            // 'penalty_type' => [
+            //     'sometimes', 
+            //     'string',
+            //     Rule::in(\App\Models\Penalty::allowedTypes()),
+            // ],
+
             'percent_of_principal_price' => 'sometimes|numeric|between:1,99',
             'is_active' => ['sometimes', 'boolean',],
         ];
