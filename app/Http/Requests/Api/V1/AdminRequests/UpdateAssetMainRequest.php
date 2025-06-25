@@ -35,13 +35,16 @@ class UpdateAssetMainRequest extends FormRequest
                 'sometimes', 'nullable', 'string',
             ],
 
-            'is_active' => [
-                'sometimes', 'boolean',
-            ],
 
-            'type' => [
-                'sometimes', 'string', Rule::in(\App\Models\AssetMain::$allowedTypes),
-            ],
+            // these two need additional Logic
+            //
+            // 'is_active' => [
+            //     'sometimes', 'boolean',
+            // ],
+
+            // 'type' => [
+            //     'sometimes', 'string', Rule::in(\App\Models\AssetMain::$allowedTypes),
+            // ],
 
             
 
