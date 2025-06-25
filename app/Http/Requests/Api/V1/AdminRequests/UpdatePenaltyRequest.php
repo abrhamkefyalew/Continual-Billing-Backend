@@ -27,14 +27,21 @@ class UpdatePenaltyRequest extends FormRequest
         return [
             // abrham check/remember
             //
-            // Can be  updated - IF it NOT being used by any active AssetUnits/AssetMains/ORDERs in the system
+            // PENALTY ID is a shared value (its ID is index and is shared b/n multiple entries in the DB)
+            //      If it is in use by other entities and we update it nevertheless, our DB integrity will become precarious.
+            //              
+            //
+            // 1. Can be  updated - IF it NOT being used by any active AssetUnits/AssetMains/ORDERs in the system
             //      BUT = needs additional Logic in the Controller/service - to check this and other things
             //
             // - BUT - 
             //
-            // SHOULD this be updated - IF it is being used by active AssetUnits/AssetMains/ORDERs in the system ?
-            //      my current thought NO
-            //      but i could find ways to address issue  - or -  handle it in way so that i can update it even if it is being actively being use
+            // 2. this SHOULD NOT this be updated - IF it is being used by active AssetUnits/AssetMains/ORDERs in the system
+            //      //
+            //      NEVER update this, B/C Penalty is a shared value (that is shared b/n multiple entries in the DB)
+            //                              //
+            //                              b/c the enterprises & payers who are actively using this Penalty trusts it to have its original value
+            //                                                           if we update it then they will see payment amounts that they do NOT expect 
             //
             //
             // 'penalty_type' => [
