@@ -1,63 +1,119 @@
-version: "3.9"
+version: "3.9"  # Use the latest supported version of Docker Compose file format
+
 
 services:
   x-nginx:
-    image: nginx:latest
+    image: nginx:1.26-alpine  # Use a stable and lightweight NGINX image (avoid 'latest')
     container_name: continual-billing-backend-nginx
-    restart: unless-stopped
+    restart: unless-stopped  # Automatically restart the container unless manually stopped
     ports:
-      - "8080:80"
+      - "7010:80"  # Map host port 7010 to container port 80 (HTTP)
     volumes:
-      - ./:/var/www/html
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./storage:/var/www/html/storage
-      - ./bootstrap/cache:/var/www/html/bootstrap/cache
+      - ./:/var/www/html  # Mount entire project directory for Laravel code access
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf  # Nginx config file (project root)
+      - ./storage:/var/www/html/storage  # Explicit bind mount for Laravel storage
+      - ./bootstrap/cache:/var/www/html/bootstrap/cache  # Explicit bind mount for cache dir
     depends_on:
-      - x-db
+      - x-db  # Wait for MySQL before starting NGINX
     networks:
-      - continual-billing-backend-network
+      - continual-billing-backend-network  # Connect to shared network
+
 
   x-app:
     build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: continual-billing-backend
-    restart: unless-stopped
+      context: .  # Build context is the project root directory
+      dockerfile: Dockerfile  # Use the updated Alpine-based Dockerfile
+    container_name: continual-billing-backend  # Laravel (PHP-FPM) application container
+    restart: unless-stopped  # Automatically restart unless manually stopped
     volumes:
-      - ./:/var/www/html
-      - ./storage:/var/www/html/storage
-      - ./bootstrap/cache:/var/www/html/bootstrap/cache
+      - ./:/var/www/html  # Laravel application code (bind mount)
+      - ./storage:/var/www/html/storage  # Explicit bind mount for Laravel storage
+      - ./bootstrap/cache:/var/www/html/bootstrap/cache  # Explicit bind mount for cache dir
+    depends_on:
+      - x-db  # Ensure DB starts first (but not wait-for-ready)
     networks:
-      - continual-billing-backend-network
+      - continual-billing-backend-network  # Connect to shared network
+    # command: |
+    #   /bin/sh -c "
+    #   echo 'Waiting for MySQL port 3306...';
+    #   while ! nc -z x-db 3306; do sleep 1; done;
+    #   echo 'MySQL is ready.';
+    #   php artisan migrate --force &&
+    #   php artisan db:seed --force &&
+    #   echo 'Laravel app starting...' &&
+    #   php-fpm -F
+    #   "
+    #  
+    #
+    # command: |
+    #   /bin/sh -c "
+    #   echo 'Waiting for MySQL...';
+    #   while ! mysqladmin ping -h x-db --silent; do sleep 1; done;
+    #   echo 'MySQL is ready.';
+    #   php artisan migrate --force &&
+    #   php artisan db:seed --force &&
+    #   echo 'Laravel app starting...' &&
+    #   php-fpm -F
+    #   "
+    #
+    #
+    #
+    command: >
+      /bin/sh -c "
+        echo 'Waiting for MySQL to accept connections...';
+        until php -r 'try { new PDO(\"mysql:host=x-db;dbname=${DB_DATABASE}\", \"${DB_USERNAME}\", \"${DB_PASSWORD}\"); exit(0); } catch (Exception \$e) { exit(1); }'; do
+          sleep 1;
+        done;
+        echo 'MySQL is ready.';
+        php artisan migrate --force &&
+        php artisan db:seed --force &&
+        echo 'Laravel app starting...' &&
+        php-fpm -F
+      "
+
+
+
+
 
   x-db:
-    image: mysql:8.0
+    image: mysql:8.4  # Use latest stable version of MySQL (instead of 8.0)
     container_name: continual-billing-backend-db
-    restart: unless-stopped
+    restart: unless-stopped  # Automatically restart on failure or reboot
     environment:
          # commented because we are NOT using empty or black password in mysql
       # MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-      MYSQL_DATABASE: ${DB_DATABASE}
+
+      MYSQL_DATABASE: ${DB_DATABASE}  # Database name from .env file
+
          # UNCommented because we are NOT using root user of mysql
-      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_USER: ${DB_USERNAME}  # Custom MySQL user (used by Laravel)
+
       # MYSQL_USER_HOST: localhost # NO Such thing
+
          # UNCommented because we are NOT using root user of mysql
-      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}  # Password for custom MySQL user
+
          # UNCommented because we are using root user of mysql and the root user password it could be either blank empty password or normal password
-         # comment this if you do NOT want additional second root user ('root'@'%') with any where access to be create // by defalut there will always be root user with localhost in mysql
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+         # comment this if I do NOT want additional second root user ('root'@'%') with any where access to be create // by defalut there will always be root user with localhost in mysql
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}  # Root password (mandatory if root used)
+
          # to create the root user make its host localhost NOT remote or Anywhere
          # root is localhost because we have new mysql user for our laravel we will use the new user and root will be localhost because it have all privilages so it is dangerous to give root remote access 
       MYSQL_ROOT_HOST: localhost
+
       # MYSQL_HOST: localhost # this may create complications # NOT tryed
+
     volumes:
-      - db_data:/var/lib/mysql
+      - db_data:/var/lib/mysql  # Persist MySQL data outside the container
     networks:
-      - continual-billing-backend-network
+      - continual-billing-backend-network  # Connect to shared network
+
+
 
 volumes:
-  db_data:
+  db_data:  # Named volume for MySQL data (persists even if container is removed)
+
 
 networks:
   continual-billing-backend-network:
-    driver: bridge
+    driver: bridge  # Use bridge driver to isolate network among services

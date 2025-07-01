@@ -56,7 +56,7 @@ class StoreAssetUnitRequest extends FormRequest
             
 
             'assetUnits.*.asset_unit_name' => 'sometimes|nullable|string',
-            'assetUnits.*.assetUnit_description' => 'sometimes|nullable|string',
+            'assetUnits.*.asset_unit_description' => 'sometimes|nullable|string',
 
         ];
     }
