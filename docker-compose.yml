@@ -67,6 +67,7 @@ services:
         echo 'MySQL is ready.';
         php artisan migrate --force &&
         php artisan db:seed --force &&
+        php artisan storage:link &&
         echo 'Laravel app starting...' &&
         php-fpm -F
       "
