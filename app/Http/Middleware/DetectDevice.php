@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
 
 class DetectDevice
@@ -20,7 +21,22 @@ class DetectDevice
     {
 
         $userAgent = $request->header('User-Agent');
+        $ip = $request->ip(); // Added to get the IP address
         $deviceType = 'other'; // Default value
+
+
+        // Skip logging and caching for local/internal IPs (SKIP caching and logging for IPs = [127.0.0.1  - or -  localhost])
+        //                                                                                                              // if the IP or url/full_url contains = [127.0.0.1  - or -  localhost] then Do NOT log
+        if (in_array($ip, ['127.0.0.1', '::1', 'localhost'])) {
+            return $next($request);
+        }
+
+
+        // Build a unique cache key per IP + User-Agent (Added caching logic)
+        $cacheKey = 'device_logged_' . md5($ip . '|' . $userAgent);
+        // Check if already logged recently (i.e., in the past 1 hour)
+        $alreadyLogged = Cache::has($cacheKey); // This fetches a value only if the cache expiry time has NOT passed
+        
 
         // Handle missing User-Agent
         if (!$userAgent) {
@@ -85,19 +101,36 @@ class DetectDevice
             $deviceType = 'web';
         }
 
-        // Attach the device type to the request so it can be used later
+        // Attach the device type to the request so it can be used later or in (i.e. [in controller/service])
         $request->merge(['device_type' => $deviceType]);
 
-        // Log all details for tracking/debugging
-        \Illuminate\Support\Facades\Log::info('Device detected', [
-            'device_type' => $deviceType,
-            'user_agent' => $userAgent,
-            'ip' => $request->ip(),
-            'ip_got_using_custom_function' => \App\Services\AppService::getIp(),
-            'url' => $request->fullUrl(),
-        ]);
 
 
+        // Log all details for tracking/debugging (only if not already logged)
+        if (!$alreadyLogged) {  // This runs only if the expiry time of the cache has passed OR the key was never cached
+
+            \App\Models\DeviceTraffic::create([
+                'device_type' => $deviceType,
+                'user_agent' => $userAgent,
+                'ip' => $ip,
+                'ip_got_using_custom_function' => \App\Services\AppService::getIp(),
+                'url' => $request->fullUrl(),
+            ]);
+
+            // Log all details for tracking/debugging
+            \Illuminate\Support\Facades\Log::info('Device detected', [
+                'device_type' => $deviceType,
+                'user_agent' => $userAgent,
+                'ip' => $request->ip(),
+                'ip_got_using_custom_function' => \App\Services\AppService::getIp(),
+                'getIp_of_Requests_that_came_from__ProxyServers_or_BroadcastedLocally' => \App\Services\AppService::getIp_of_Requests_that_came_from__ProxyServers_or_BroadcastedLocally(),
+                'url' => $request->fullUrl(),
+            ]);
+
+            // **NEW**: Store a value in the cache that expires in 1 hour
+            Cache::put($cacheKey, true, now()->addHour());
+
+        }
 
         return $next($request);
     }
