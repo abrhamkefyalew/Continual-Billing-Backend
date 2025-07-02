@@ -113,6 +113,7 @@ services:
         echo "MySQL is ready.";
         php artisan migrate --force &&
         php artisan db:seed --force &&
+        rm -rf public/storage &&
         [ ! -L public/storage ] && php artisan storage:link &&
         echo "Laravel app starting..." &&
         php-fpm -F
