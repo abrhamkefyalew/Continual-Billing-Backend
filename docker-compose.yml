@@ -85,21 +85,38 @@ services:
     #   "
     #
     #
+    # for docker compose (NEWer)
+    # command: >
+    #   /bin/sh -c "
+    #     echo 'Waiting for MySQL to accept connections...';
+    #     until php -r \"try { new PDO('mysql:host=x-db;dbname=${DB_DATABASE}', '${DB_USERNAME}', '${DB_PASSWORD}'); exit(0); } catch (Exception \$e) { exit(1); }\";
+    #     do
+    #       sleep 1;
+    #     done;
+    #     echo 'MySQL is ready.';
+    #     php artisan migrate --force &&
+    #     php artisan db:seed --force &&
+    #     [ ! -L public/storage ] && php artisan storage:link &&
+    #     echo 'Laravel app starting...' &&
+    #     php-fpm -F
+    #   "
     #
+    #
+    # for docker-compose (OLDer)
     command: >
-      /bin/sh -c "
-        echo 'Waiting for MySQL to accept connections...';
-        until php -r \"try { new PDO('mysql:host=x-db;dbname=${DB_DATABASE}', '${DB_USERNAME}', '${DB_PASSWORD}'); exit(0); } catch (Exception \$e) { exit(1); }\";
+      /bin/sh -c '
+        echo "Waiting for MySQL to accept connections...";
+        until php -r '\''try { new PDO("mysql:host=x-db;dbname=${DB_DATABASE}", "${DB_USERNAME}", "${DB_PASSWORD}"); exit(0); } catch (Exception $e) { exit(1); }'\''; 
         do
           sleep 1;
         done;
-        echo 'MySQL is ready.';
+        echo "MySQL is ready.";
         php artisan migrate --force &&
         php artisan db:seed --force &&
         [ ! -L public/storage ] && php artisan storage:link &&
-        echo 'Laravel app starting...' &&
+        echo "Laravel app starting..." &&
         php-fpm -F
-      "
+      '
 
 
 
