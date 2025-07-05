@@ -36,16 +36,29 @@ use App\Http\Controllers\Api\V1\EnterpriseUser\EnterpriseUserController as Enter
 */
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+
+    // all of them WORK
+    //
+    // return $request->user();
+    // return auth()?->user();
+    return auth()?->guard()?->user();
+    
+
 });
 
 
 
 Route::get('check-ip', function () {
-    $message = "Check IP: - request came from ip (IP from request): - \n - using DEFAULT IP CHECKER (From Laravel Helper function) = " . request()->ip() . " ,   \n - using CUSTOM IP CHECKER (From New function) = " . \App\Services\AppService::getIp();
+    $message = "Check IP: - request came from ip (IP from request):" . 
+    " - \n - using DEFAULT IP CHECKER (From Laravel Helper function) = " . request()->ip() . 
+    " ,   \n - using CUSTOM IP CHECKER (From New function) = " . \App\Services\AppService::getIp() . 
+    " ,   \n - Ip of Request behind Proxy Server or local Broadcast = " . \App\Services\AppService::getIp_of_Requests_that_came_from__ProxyServers_or_BroadcastedLocally() . 
+    " ,   \n - Ip of Request Advanced Deep Trace = " . \App\Services\AppService::getIpAdvanced_deep_tracing();
 
     \Illuminate\Support\Facades\Log::info($message);
 
+    // return auth()?->guard()?->user()->id;
+    // return auth()?->guard()?->user();
     return $message;
 });
 

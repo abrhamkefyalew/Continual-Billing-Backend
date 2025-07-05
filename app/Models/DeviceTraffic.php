@@ -19,10 +19,14 @@ class DeviceTraffic extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'user_id',
+        'user_id_description',
         'device_type',
         'user_agent',
         'ip',
         'ip_got_using_custom_function',
+        'ip_behind_proxy_or_broadcast',
+        'ip_advanced_deep_tracing',
         'url',
     ];
 

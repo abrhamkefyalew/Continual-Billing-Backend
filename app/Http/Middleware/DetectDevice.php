@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Laravel\Sanctum\PersonalAccessToken;
 use Symfony\Component\HttpFoundation\Response;
 
 class DetectDevice
@@ -21,7 +22,7 @@ class DetectDevice
     {
 
         $userAgent = $request->header('User-Agent');
-        $ip = $request->ip(); // Added to get the IP address
+        $ip = \App\Services\AppService::getIp(); // Added to get the IP address
         $deviceType = 'other'; // Default value
 
 
@@ -37,6 +38,34 @@ class DetectDevice
         // Check if already logged recently (i.e., in the past 1 hour)
         $alreadyLogged = Cache::has($cacheKey); // This fetches a value only if the cache expiry time has NOT passed
         
+
+        // 1. Manually check the token without setting auth()->user()
+        $userId = null;
+        $description = null;
+
+        $accessToken = $request->bearerToken();
+
+        if ($accessToken) {
+            // Find token using Sanctum's personal access token model
+            $token = PersonalAccessToken::findToken($accessToken);
+
+            // Check if the token exists and has abilities
+            if ($token && $token->abilities) {
+                // Directly get user info from token without setting auth()->user()
+                $user = $token->tokenable; // This is the associated user model
+
+                // Safety checks before accessing user properties
+                if ($user && is_object($user) && class_exists(get_class($user))) {
+                    // Get the user ID and the user class
+                    $userId = $user?->id ?? null;
+                    $description = get_class($user); // This will give you 'App\Models\User' or any other user model
+
+                    // Now you can use $userId and $description for logging or other operations
+                }
+            }
+        }
+
+
 
         // Handle missing User-Agent
         if (!$userAgent) {
@@ -110,20 +139,29 @@ class DetectDevice
         if (!$alreadyLogged) {  // This runs only if the expiry time of the cache has passed OR the key was never cached
 
             \App\Models\DeviceTraffic::create([
+                'user_id' => $userId, // Log the user_id
+                'user_id_description' => $description, // Log the dynamic user model name
+
                 'device_type' => $deviceType,
                 'user_agent' => $userAgent,
-                'ip' => $ip,
+                'ip' => $request->ip(),
                 'ip_got_using_custom_function' => \App\Services\AppService::getIp(),
+                'ip_behind_proxy_or_broadcast' => \App\Services\AppService::getIp_of_Requests_that_came_from__ProxyServers_or_BroadcastedLocally(),
+                'ip_advanced_deep_tracing' => \App\Services\AppService::getIpAdvanced_deep_tracing(),
                 'url' => $request->fullUrl(),
             ]);
 
             // Log all details for tracking/debugging
             \Illuminate\Support\Facades\Log::info('Device detected', [
+                'user_id' => $userId, // Log the user_id
+                'user_id_description' => $description, // Log the dynamic user model name
+                
                 'device_type' => $deviceType,
                 'user_agent' => $userAgent,
                 'ip' => $request->ip(),
                 'ip_got_using_custom_function' => \App\Services\AppService::getIp(),
-                'getIp_of_Requests_that_came_from__ProxyServers_or_BroadcastedLocally' => \App\Services\AppService::getIp_of_Requests_that_came_from__ProxyServers_or_BroadcastedLocally(),
+                'ip_behind_proxy_or_broadcast' => \App\Services\AppService::getIp_of_Requests_that_came_from__ProxyServers_or_BroadcastedLocally(),
+                'ip_advanced_deep_tracing' => \App\Services\AppService::getIpAdvanced_deep_tracing(),
                 'url' => $request->fullUrl(),
             ]);
 
