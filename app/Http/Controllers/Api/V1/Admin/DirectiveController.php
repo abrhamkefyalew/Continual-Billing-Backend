@@ -38,11 +38,15 @@ class DirectiveController extends Controller
     public function store(StoreDirectiveRequest $request)
     {
         //
-        // $var = DB::transaction(function () {
+        $var = DB::transaction(function () use ($request) {
             
-        // });
+            $directive = Directive::create($request->validated());
 
-        // return $var;
+            return DirectiveResource::make($directive);
+
+        });
+
+        return $var;
     }
 
     /**
@@ -61,11 +65,15 @@ class DirectiveController extends Controller
     public function update(UpdateDirectiveRequest $request, Directive $directive)
     {
         //
-        // $var = DB::transaction(function () {
-            
-        // });
+        $var = DB::transaction(function () use ($request, $directive) {
 
-        // return $var;
+            $directive->update($request->validated());
+
+            return DirectiveResource::make($directive);
+            
+        });
+
+        return $var;
     }
 
     /**

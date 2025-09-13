@@ -4,19 +4,24 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\Admin\RoleController;
 use App\Http\Controllers\Api\V1\Admin\AdminController;
+use App\Http\Controllers\Api\V1\Admin\PayerController;
+use App\Http\Controllers\Api\V1\Admin\PenaltyController;
 use App\Http\Controllers\Api\V1\Admin\AssetMainController;
 use App\Http\Controllers\Api\V1\Admin\AssetPoolController;
 use App\Http\Controllers\Api\V1\Admin\AssetUnitController;
-use App\Http\Controllers\Api\V1\Admin\AuditTrailController;
 use App\Http\Controllers\Api\V1\Admin\DirectiveController;
+use App\Http\Controllers\Api\V1\Admin\AuditTrailController;
 use App\Http\Controllers\Api\V1\Admin\EnterpriseController;
 use App\Http\Controllers\Api\V1\Admin\PermissionController;
-use App\Http\Controllers\Api\V1\Admin\EnterpriseUserController;
 use App\Http\Controllers\Api\V1\Admin\InvoicePoolController;
 use App\Http\Controllers\Api\V1\Admin\InvoiceUnitController;
-use App\Http\Controllers\Api\V1\Admin\PayerController;
-use App\Http\Controllers\Api\V1\Admin\PenaltyController;
+use App\Http\Controllers\Api\V1\Admin\EnterpriseUserController;
 use App\Http\Controllers\Api\V1\Auth\AdminAuth\AdminAuthController;
+use App\Http\Controllers\Api\V1\Auth\PayerAuth\PayerAuthController;
+use App\Http\Controllers\Api\V1\Payer\PayerController as PayerForPayerController;
+use App\Http\Controllers\Api\V1\Auth\EnterpriseUserAuth\EnterpriseUserAuthController;
+use App\Http\Controllers\Api\V1\EnterpriseUser\EnterpriseController as EnterpriseForEnterpriseController;
+use App\Http\Controllers\Api\V1\EnterpriseUser\EnterpriseUserController as EnterpriseUserForEnterpriseController;
 
 
 /*
@@ -31,16 +36,29 @@ use App\Http\Controllers\Api\V1\Auth\AdminAuth\AdminAuthController;
 */
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+
+    // all of them WORK
+    //
+    // return $request->user();
+    // return auth()?->user();
+    return auth()?->guard()?->user();
+    
+
 });
 
 
 
 Route::get('check-ip', function () {
-    $message = "Check IP: - request came from ip (IP from request): - \n - using DEFAULT IP CHECKER (From Laravel Helper function) = " . request()->ip() . " ,   \n - using CUSTOM IP CHECKER (From New function) = " . \App\Services\AppService::getIp();
+    $message = "Check IP: - request came from ip (IP from request):" . 
+    " - \n - using DEFAULT IP CHECKER (From Laravel Helper function) = " . request()->ip() . 
+    " ,   \n - using CUSTOM IP CHECKER (From New function) = " . \App\Services\AppService::getIp() . 
+    " ,   \n - Ip of Request behind Proxy Server or local Broadcast = " . \App\Services\AppService::getIp_of_Requests_that_came_from__ProxyServers_or_BroadcastedLocally() . 
+    " ,   \n - Ip of Request Advanced Deep Trace = " . \App\Services\AppService::getIpAdvanced_deep_tracing();
 
     \Illuminate\Support\Facades\Log::info($message);
 
+    // return auth()?->guard()?->user()->id;
+    // return auth()?->guard()?->user();
     return $message;
 });
 
@@ -48,6 +66,10 @@ Route::get('check-ip', function () {
 
 Route::get('/test-handler', function () {
     return get_class(app()->make(Illuminate\Contracts\Debug\ExceptionHandler::class));
+});
+
+Route::get('test-helper', function () {
+    return slugify_string("Café Déjà Vu! — Hello World 2025");
 });
 
 
@@ -310,6 +332,130 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
 
 
+
+    });
+
+
+
+
+    
+
+
+
+
+
+
+
+
+    // enterprise users route (for enterprises)
+    Route::prefix('enterprise_user')->group(function () {
+        Route::prefix('auths')->group(function () {
+            // there should NOT be EnterpriseUser registration, -  
+            // EnterpriseUser should be stored by an already existing EnterpriseUser admin or super admin of the system -
+            // there should be a route for EnterpriseUser storing by both EnterpriseUser admin and super admin
+            //
+            //
+            Route::post('/login', [EnterpriseUserAuthController::class, 'login']);
+            Route::post('/login_otp', [EnterpriseUserAuthController::class, 'loginOtp']);
+            Route::post('/verify_otp', [EnterpriseUserAuthController::class, 'verifyOtp']);
+
+
+
+
+        });
+
+
+
+
+        Route::middleware(['auth:sanctum', 'abilities:access-enterpriseUser'])->group(function () {
+
+            Route::prefix('tokens')->group(function () {
+                Route::post('/logout', [EnterpriseUserAuthController::class, 'logout']);
+                Route::post('/logout-all-devices', [EnterpriseUserAuthController::class, 'logoutAllDevices']);
+            });
+
+
+            Route::prefix('enterprise_profile')->group(function () {
+                //
+                Route::prefix('/{enterprise}')->group(function () {
+                    Route::get('/', [EnterpriseForEnterpriseController::class, 'show']);
+                    Route::put('/', [EnterpriseForEnterpriseController::class, 'update']);
+                }); 
+            });
+
+
+            Route::prefix('enterprise_users')->group(function () {
+                Route::post('/', [EnterpriseUserForEnterpriseController::class, 'store']);
+                Route::get('/', [EnterpriseUserForEnterpriseController::class, 'index']);
+                Route::prefix('/{enterpriseUser}')->group(function () {
+                    Route::get('/', [EnterpriseUserForEnterpriseController::class, 'show']);
+                    Route::put('/', [EnterpriseUserForEnterpriseController::class, 'update']);
+                    Route::delete('/', [EnterpriseUserForEnterpriseController::class, 'destroy']);
+                }); 
+            });
+
+
+
+        });
+
+    });
+
+
+
+
+
+
+
+
+
+
+
+    Route::prefix('payer')->group(function () {
+        Route::prefix('auths')->group(function () {
+            // there should be BOTH Payer registration and Payer Store, -  
+            //
+            // Payer can be registered by himself on the system -
+            // or
+            // Payer can be stored by super admin of the system -
+            //
+            // there should be a route for Payer Registration by himself
+            // there should be a route for Payer storing by super admin
+
+            Route::post('/register', [PayerAuthController::class, 'register']);
+            //
+            //
+            Route::post('/login', [PayerAuthController::class, 'login']);
+            Route::post('/login_otp', [PayerAuthController::class, 'loginOtp']);
+            Route::post('/verify_otp', [PayerAuthController::class, 'verifyOtp']);
+
+
+
+        });
+
+
+
+
+        Route::middleware(['auth:sanctum', 'abilities:access-payer'])->group(function () {
+
+            Route::prefix('tokens')->group(function () {
+                Route::post('/logout', [PayerAuthController::class, 'logout']);
+                Route::post('/logout-all-devices', [PayerAuthController::class, 'logoutAllDevices']);
+            });
+
+
+
+            // currently this payers route is NOT functional, 
+            // because payer is registering in the open routes, and when they logs in i will return their full info
+            Route::prefix('payer_profile')->group(function () {
+                // 
+                Route::prefix('/{payer}')->group(function () {
+                    Route::get('/', [PayerForPayerController::class, 'show']);
+                    Route::put('/', [PayerForPayerController::class, 'update']);
+                }); 
+            });
+
+
+        });
 
     });
 

@@ -15,13 +15,23 @@ return new class extends Migration
         Schema::create('asset_units', function (Blueprint $table) {
             $table->id()->from(10000);
 
-            $table->foreignId('enterprise_id')->constrained('enterprises');
-            $table->foreignId('asset_main_id')->constrained('asset_mains');
+            $table->string('asset_unit_code');
+
             $table->foreignId('payer_id')->constrained('payers');
+
+            // since this project is NOT property/asset management, in the future this project might use another property/asset management system 
+            // this means NO asset_mains table, so the enterprise_id exists here to correctly identify who owns the property at such times
+            $table->foreignId('enterprise_id')->constrained('enterprises'); 
+            $table->foreignId('asset_main_id')->constrained('asset_mains');
+            
             $table->foreignId('directive_id')->constrained('directives');
             $table->foreignId('penalty_id')->constrained('penalties');
 
 
+            $table->integer('penalty_starts_after_days');    // this should ONLY be number of days // any integer/number stored in this column is considered as number of days
+            $table->decimal('service_termination_penalty', 10, 2); // this penalty will be calculated When/IF the payer want to terminate his service of his asset usage
+
+            $table->decimal('price_principal', 10, 2);
             $table->boolean('is_payment_by_term_end')->default(1); 
                                             //
                                             // 1. this column is checked for the following directive types ONLY =
@@ -71,14 +81,6 @@ return new class extends Migration
                                                     
                                             //}
 
-                                            
-
-
-            $table->integer('penalty_starts_after_days');    // this should ONLY be number of days // any integer/number stored in this column is considered as number of days
-            $table->decimal('service_termination_penalty', 10, 2); // this penalty will be calculated When/IF the payer want to terminate his service of his asset usage
-
-            $table->decimal('price_principal', 10, 2);
-
             $table->string('payment_status')->default(AssetUnit::ASSET_UNIT_PAYMENT_NOT_STARTED);
 
 
@@ -97,7 +99,7 @@ return new class extends Migration
             $table->boolean('payer_can_terminate')->default(0);
 
 
-            $table->boolean('is_engaged')->default(0); // this is for, is the asset CURRENTLY Under-Way (asset Unit) - or - Under-Use (Asset Pool)?
+            $table->boolean('is_engaged')->default(0); // this is for, is the asset/event/campaign CURRENTLY Under-Way (Asset Pool)?
                                                                                                                     //
                                                                                                                     // AssetUnit 
                                                                                                                             // 0 = The Asset (i.e. house) is CURRENTLY NOT Occupied by SOMEONE else (i.e. vacant) - is used to make individual asset FREE, so that it can be used by Anyone else

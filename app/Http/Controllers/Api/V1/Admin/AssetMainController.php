@@ -43,7 +43,35 @@ class AssetMainController extends Controller
     public function store(StoreAssetMainRequest $request)
     {
         //
-        $var = DB::transaction(function () {
+        $var = DB::transaction(function () use($request) {
+
+            $assetMain = AssetMain::create([
+                'enterprise_id' => $request['enterprise_id'],
+                'asset_name' => $request['asset_name'],
+                'asset_description' => $request['asset_description'],
+                'type' => $request->input('type', AssetMain::ASSET_MAIN_OF_ASSET_UNIT_TYPE),
+                'is_active' => (int) $request->input('is_active', 1),                                                                        
+            ]);
+
+
+
+            // if the assetMain have an actual location , where it is currently located
+            if ($request->has('country') || $request->has('city')) {
+                $assetMain->address()->create([
+                    'country' => $request->input('country'),
+                    'city' => $request->input('city'),
+                ]);
+            }
+
+
+            if ($request->has('asset_profile_image')) {
+                $file = $request->file('asset_profile_image');
+                $clearMedia = false; // or true // // NO assetMain image remove, since it is the first time the assetMain is being stored
+                $collectionName = AssetMain::ASSET_MAIN_PROFILE_PICTURE;
+                MediaService::storeImage($assetMain, $file, $clearMedia, $collectionName);
+            }
+
+            return AssetMainResource::make($assetMain->load(['address', 'media', 'enterprise']));
             
         });
 
@@ -66,11 +94,47 @@ class AssetMainController extends Controller
     public function update(UpdateAssetMainRequest $request, AssetMain $assetMain)
     {
         //
-        // $var = DB::transaction(function () {
-            
-        // });
+        $var = DB::transaction(function () use ($request, $assetMain) {
 
-        // return $var;
+            $success = $assetMain->update($request->validated());
+            //
+            if (!$success) {
+                return response()->json(['message' => 'Update Failed'], 500);
+            }
+
+
+            if ($request->has('country') || $request->has('city')) {
+                if ($assetMain->address) {
+                    $assetMain->address()->update([
+                        'country' => $request->input('country'),
+                        'city' => $request->input('city'),
+                    ]);
+                } else {
+                    $assetMain->address()->create([
+                        'country' => $request->input('country'),
+                        'city' => $request->input('city'),
+                    ]);
+                }
+            }
+
+
+
+            if ($request->has('asset_profile_image')) {
+                $file = $request->file('asset_profile_image');
+                $clearMedia = (isset($request['asset_profile_image_remove']) ? $request['asset_profile_image_remove'] : false);
+                $collectionName = AssetMain::ASSET_MAIN_PROFILE_PICTURE;
+                MediaService::storeImage($assetMain, $file, $clearMedia, $collectionName);
+            }
+
+
+            $updatedAssetMain = AssetMain::find($assetMain->id);
+
+
+            return AssetMainResource::make($updatedAssetMain->load(['address', 'media', 'enterprise']));
+            
+        });
+
+        return $var;
     }
 
     /**

@@ -21,8 +21,8 @@ return new class extends Migration
             $table->boolean('is_active')->default(1); // this is for, is the asset currently available (Asset Unit  - or -  Asset Pool) ?
                                                                                                                     //
                                                                                                                     // AssetUnit 
-                                                                                                                            // 0 = The Asset (i.e. house) can NOT be used   - is used to make an individual Asset Un-Usable
-                                                                                                                            // 1 = The Asset (i.e. house) can be USED       - is used to make an individual Asset Usable
+                                                                                                                            // 0 = The Asset (i.e. house) can NOT be used   - is used to make an individual Asset Un-Usable (deactivate it)
+                                                                                                                            // 1 = The Asset (i.e. house) can be USED       - is used to make an individual Asset Usable    (activate it)
                                                                                                                     // AssetPool
                                                                                                                             // 0 = The Asset (i.e. ekub or edir) is currently on HOLD / NOT Available for participation     - is used to make a group Asset Un-Available - make it un Attendeble
                                                                                                                             // 1 = The Asset (i.e. ekub or edir) is currently Open / AVAILABLE for participation            - is used to make a group Asset Available    - make it Attendeble

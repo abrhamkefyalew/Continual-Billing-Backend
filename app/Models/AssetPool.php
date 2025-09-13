@@ -21,15 +21,16 @@ class AssetPool extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        // 'payer_id',  // for now this one will NOT be needed, putting this will make one collective/group asset be rented/contracted by a single payer   // abram check    // I will use a separate contract table to put in a single payer info for that assetPool
         'enterprise_id',
         'asset_main_id',
-        // 'payer_id',  // for now this one will NOT be needed // abrham check
         'directive_id',
         'penalty_id',
-        'is_payment_by_term_end',
         'penalty_starts_after_days',
         'service_termination_penalty',
         'price_principal',
+        'is_payment_by_term_end',
+        // 'payment_status', // since it is a collective asset , there is NO single payment status to identify completion or starting of payment, so this will NEVER be needed
         'start_date',
         'end_date',
         'original_end_date',

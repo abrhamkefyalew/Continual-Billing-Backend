@@ -100,6 +100,15 @@ class EnterpriseUserController extends Controller
     {
         //
         $var = DB::transaction(function () use ($request, $enterpriseUser) {
+
+            // if is_admin: - is sent in the update as = 0,
+            //                          //
+            //                          // Before we do the following udate, we NEED to check the following 
+            //                                            // first we must check that there is at least one enterpriseUser with = is_admin = 1
+            //                                            // that remaining admin should also have = is_active = 1
+            //
+            //                // in conclusion = there should be at least ONE ACTIVE enterpriseUser that have ADMIN flag
+            //
             
             $success = $enterpriseUser->update($request->validated());
             //

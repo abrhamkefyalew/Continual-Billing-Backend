@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Api\V1\AdminRequests;
 
+use App\Models\Penalty;
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StorePenaltyRequest extends FormRequest
@@ -12,6 +14,8 @@ class StorePenaltyRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+
+        // return $this->user()->can('create', Penalty::class);
     }
 
     /**
@@ -22,7 +26,13 @@ class StorePenaltyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'penalty_type' => [
+                'required', 
+                'string',
+                Rule::in(\App\Models\Penalty::allowedTypes()),
+            ],
+            'percent_of_principal_price' => 'required|numeric|between:1,99',
+            'is_active' => ['sometimes', 'boolean',],
         ];
     }
 }

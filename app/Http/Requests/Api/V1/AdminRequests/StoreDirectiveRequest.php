@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\V1\AdminRequests;
 
+use App\Models\Directive;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreDirectiveRequest extends FormRequest
@@ -12,6 +13,8 @@ class StoreDirectiveRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+
+        // return $this->user()->can('create', Directive::class);
     }
 
     /**
@@ -23,6 +26,9 @@ class StoreDirectiveRequest extends FormRequest
     {
         return [
             //
+            'directive_type' => ['required', 'string', 'unique:directives,directive_type'],
+            'is_active' => ['sometimes', 'boolean',],
+            'name' => ['sometimes', 'nullable', 'string'],
         ];
     }
 }

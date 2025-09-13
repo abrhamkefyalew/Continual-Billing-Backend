@@ -26,7 +26,9 @@ class UpdateEnterpriseUserRequest extends FormRequest
     {
         return [
             //
-            'enterprise_id' => 'sometimes|integer|exists:enterprises,id',
+            // 'enterprise_id' => 'sometimes|integer|exists:enterprises,id',  // should never UPDATE this, b/c if updated:- the changed enterprise_id will own all the changelogs of the updated enterprize user
+            //
+
             'first_name' => [
                 'sometimes', 'string', 'regex:/^\S*$/u', 'alpha',
             ],

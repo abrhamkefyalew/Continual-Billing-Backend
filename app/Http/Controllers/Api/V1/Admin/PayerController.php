@@ -62,11 +62,61 @@ class PayerController extends Controller
     public function update(UpdatePayerRequest $request, Payer $payer)
     {
         //
-        // $var = DB::transaction(function () {
+        $var = DB::transaction(function () use($request, $payer) {
             
-        // });
 
-        // return $var;
+            $success = $payer->update($request->validated());
+            //
+            if (!$success) {
+                return response()->json(['message' => 'Update Failed'], 500);
+            }
+            
+
+            if ($request->has('country') || $request->has('city')) {
+                if ($payer->address) {
+                    $payer->address()->update([
+                        'country' => $request->input('country'),
+                        'city' => $request->input('city'),
+                    ]);
+                } else {
+                    $payer->address()->create([
+                        'country' => $request->input('country'),
+                        'city' => $request->input('city'),
+                    ]);
+                }
+            }
+
+
+            if ($request->has('payer_profile_image')) {
+                $file = $request->file('payer_profile_image');
+                $clearMedia = $request->input('payer_profile_image_remove', false);
+                $collectionName = Payer::PAYER_PROFILE_PICTURE;
+                MediaService::storeImage($payer, $file, $clearMedia, $collectionName);
+            }
+
+            //
+            if ($request->has('payer_id_front_image')) {
+                $file = $request->file('payer_id_front_image');
+                $clearMedia = $request->input('payer_id_front_image_remove', false);
+                $collectionName = Payer::PAYER_ID_FRONT_PICTURE;
+                MediaService::storeImage($payer, $file, $clearMedia, $collectionName);
+            }
+            if ($request->has('payer_id_back_image')) {
+                $file = $request->file('payer_id_back_image');
+                $clearMedia = $request->input('payer_id_back_image_remove', false);
+                $collectionName = Payer::PAYER_ID_BACK_PICTURE;
+                MediaService::storeImage($payer, $file, $clearMedia, $collectionName);
+            }
+            
+
+            $updatedPayer = Payer::find($payer->id);
+            
+            return PayerResource::make($updatedPayer->load('media', 'address'));
+
+
+        });
+
+        return $var;
     }
 
     /**
